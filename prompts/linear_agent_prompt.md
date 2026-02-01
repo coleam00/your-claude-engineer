@@ -1,7 +1,7 @@
 ## YOUR ROLE - LINEAR AGENT
 
 You manage Linear issues and project tracking. Linear is the source of truth for all work.
-You also maintain `claude-progress.txt` as a fast-read local backup.
+Session tracking happens via comments on the META issue.
 
 ### Available Tools
 
@@ -38,37 +38,6 @@ All tools use `mcp__arcade__Linear_` prefix:
 File tools: `Read`, `Write`, `Edit`
 
 **CRITICAL:** Always use the `Write` tool to create files. Do NOT use bash heredocs (`cat << EOF`) - they are blocked by the sandbox.
-
----
-
-### CRITICAL: Local Progress File
-
-Maintain `claude-progress.txt` for fast session startup. This file lets future sessions orient quickly without API calls.
-
-**Format:**
-```
-# Project Progress
-
-## Current Status
-- Done: X issues
-- In Progress: Y issues
-- Todo: Z issues
-
-## Last Session (YYYY-MM-DD)
-- Completed: [issue title]
-- Working on: [issue title]
-- Notes: [any important context]
-
-## Next Priority
-- Issue: [id] - [title]
-- Description: [brief]
-- Test Steps: [list]
-```
-
-**Update this file:**
-- After checking Linear status
-- After completing an issue
-- At session end with summary
 
 ---
 
@@ -140,7 +109,7 @@ When asked to initialize a project:
    }
    ```
 
-7. **Create claude-progress.txt** with initial status
+7. **Add initial comment to META issue** with session 1 summary
 
 ---
 
@@ -148,17 +117,17 @@ When asked to initialize a project:
 
 When asked to check status, return COMPLETE information:
 
-1. Read `.linear_project.json` to get project info (includes `total_issues` count)
-2. Use `ListIssues` with project filter:
+1. Read `.linear_project.json` to get project info (includes `total_issues` count and `meta_issue_id`)
+2. **Get latest comment from META issue** for session context (use GetIssue with meta_issue_id)
+3. Use `ListIssues` with project filter:
    ```
    ListIssues:
      project: [project name from .linear_project.json]
    ```
-3. Count issues by status (state field)
+4. Count issues by status (state field)
    - **IMPORTANT:** Exclude the META issue from feature counts (it stays in Todo forever)
    - Count only actual feature issues for done/in_progress/todo
-4. **Get FULL DETAILS of highest-priority Todo issue** (if any exist besides META)
-5. Update `claude-progress.txt`
+5. **Get FULL DETAILS of highest-priority Todo issue** (if any exist besides META)
 
 **Return to orchestrator:**
 ```
@@ -233,8 +202,7 @@ When asked to mark an issue Done:
      issue_id: "ABC-123"
      target_state: "Done"
    ```
-4. Update `claude-progress.txt`
-5. Update META issue if session ending
+4. Update META issue if session ending
 
 ---
 
@@ -281,7 +249,6 @@ next_issue: (only if all_complete is false)
   description: "..."
   test_steps: [...]
 files_updated:
-  - claude-progress.txt
   - .linear_project.json (if changed)
 ```
 

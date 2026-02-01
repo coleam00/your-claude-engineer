@@ -193,6 +193,32 @@ npm install && npm run dev
 
 ---
 
+### CRITICAL: No Temporary Files
+
+**DO NOT leave temporary files in the project directory.** The project root should only contain:
+- Application source code (in proper directories like `src/`, `frontend/`, `agent/`, etc.)
+- Configuration files (package.json, tsconfig.json, .env, etc.)
+- `screenshots/` directory (for evidence)
+- `README.md`, `init.sh`, `.gitignore`
+- `.linear_project.json`
+
+**DO NOT create these files:**
+- `*_IMPLEMENTATION_SUMMARY.md` or `IMPLEMENTATION_SUMMARY_*.md`
+- `*_TEST_RESULTS.md` or `TEST_REPORT_*.md`
+- `*_VERIFICATION_REPORT.md`
+- One-off test scripts like `test_*.py`, `verify_*.py`, `create_*.py`
+- Test HTML files like `test-*.html`, `*_visual.html`
+- Debug output files like `*_output.txt`, `demo_*.txt`
+
+**If you need to run a quick test:**
+1. Use inline commands or the Playwright MCP tools directly
+2. Do NOT create standalone test scripts
+3. If you absolutely must create a temp file, DELETE it immediately after use
+
+**Clean up rule:** Before finishing any task, check for and delete any temporary files you created in the project root.
+
+---
+
 ### Output Checklist
 
 Before reporting back to orchestrator, verify you have:

@@ -249,8 +249,28 @@ than to start another issue and risk running out of context mid-implementation.
 - Zero console errors
 - Polished UI
 - All features work end-to-end through the UI
+- Clean project directory (no temp files)
 
 **Context is finite.** Err on the side of ending sessions early with good handoff notes.
+
+---
+
+## CRITICAL: No Temporary Files
+
+**Keep the project root clean.** Only these files belong in the project root:
+- Application source code (in proper directories like `src/`, `frontend/`, etc.)
+- Configuration files (package.json, tsconfig.json, .gitignore, etc.)
+- `screenshots/` directory (for evidence)
+- `README.md`, `init.sh`, `app_spec.txt`
+- `.linear_project.json`
+
+**DO NOT create:**
+- `*_IMPLEMENTATION_SUMMARY.md`, `*_TEST_RESULTS.md`, `*_REPORT.md`
+- Standalone test scripts (`test_*.py`, `verify_*.py`, `create_*.py`)
+- Test HTML files (`test-*.html`, `*_visual.html`)
+- Debug output files (`*_output.txt`)
+
+**If you need temp files:** Delete them immediately after use. Before ending any session, clean up any temp files you created.
 
 ---
 

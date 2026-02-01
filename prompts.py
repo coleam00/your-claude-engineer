@@ -72,8 +72,8 @@ Delegate to `linear` agent:
 1. Create a Linear project with appropriate name
 2. Create issues for ALL features from app_spec.txt (with test steps in description)
 3. Create a META issue '[META] Project Progress Tracker' for session handoffs
-4. Save state to .linear_project.json
-5. Create claude-progress.txt with initial project summary
+4. Add initial comment to META issue with project summary and session 1 status
+5. Save state to .linear_project.json
 6. Return: project_id, total_issues created, meta_issue_id"
 
 ### Step 2: Initialize Git
@@ -82,7 +82,7 @@ Delegate to `github` agent:
 1. git init
 2. Create README.md with project overview
 3. Create init.sh script to start dev server
-4. Initial commit with these files + .linear_project.json + claude-progress.txt"
+4. Initial commit with these files + .linear_project.json"
 
 ### Step 3: Start First Feature (if time permits)
 Get the highest-priority issue details from linear agent, then delegate to `coding` agent:
@@ -100,11 +100,10 @@ Requirements:
 
 ### Step 4: Commit Progress
 If coding was done, delegate to `github` agent to commit.
-Then delegate to `linear` agent to update progress.
+Then delegate to `linear` agent to add session summary comment to META issue.
 
 ## OUTPUT FILES TO CREATE
 - .linear_project.json (project state)
-- claude-progress.txt (session history for fast reads)
 - init.sh (dev server startup)
 - README.md (project overview)
 
@@ -125,18 +124,17 @@ This is a CONTINUATION session. The project has already been initialized.
 
 ### Step 1: Orient
 - Run `pwd` to confirm working directory
-- Read `claude-progress.txt` for recent session history
-- Read `.linear_project.json` for project IDs
+- Read `.linear_project.json` for project IDs (including meta_issue_id)
 
 ### Step 2: Get Status from Linear (CHECK FOR COMPLETION)
 Delegate to `linear` agent:
 "Read .linear_project.json, then:
-1. List all issues and count by status (Done/In Progress/Todo) - EXCLUDE META issue from counts
-2. Compare done count to total_issues from .linear_project.json
-3. Return all_complete: true if done == total_issues, false otherwise
-4. If not complete: Get FULL DETAILS of highest-priority issue to work on
-5. Update claude-progress.txt with current status
-6. Return: status counts, all_complete flag, and issue context if not complete"
+1. Get the latest comment from the META issue (meta_issue_id) for session context
+2. List all issues and count by status (Done/In Progress/Todo) - EXCLUDE META issue from counts
+3. Compare done count to total_issues from .linear_project.json
+4. Return all_complete: true if done == total_issues, false otherwise
+5. If not complete: Get FULL DETAILS of highest-priority issue to work on
+6. Return: status counts, all_complete flag, last session context, and issue context if not complete"
 
 **IF all_complete is true:**
 1. Ask linear agent to add "PROJECT COMPLETE" comment to META issue
@@ -177,8 +175,14 @@ Delegate to `linear` agent:
 "Mark issue [id] as Done. Add comment with:
 - Files changed
 - Screenshot evidence path
-- Test results
-Update claude-progress.txt with session summary."
+- Test results"
+
+### Step 7: Session Handoff (if ending session)
+If ending the session, delegate to `linear` agent:
+"Add session summary comment to META issue with:
+- What was completed
+- Current progress counts
+- Notes for next session"
 
 ## CRITICAL RULES
 - Do NOT skip the verification test in Step 3

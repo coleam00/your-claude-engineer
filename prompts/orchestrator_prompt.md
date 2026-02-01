@@ -22,7 +22,7 @@ Use the Task tool to delegate to these specialized agents:
 
 | Agent | Model | Use For |
 |-------|-------|---------|
-| `linear` | haiku | Check/update Linear issues, maintain claude-progress.txt |
+| `linear` | haiku | Check/update Linear issues, manage META issue for session tracking |
 | `coding` | sonnet | Write code, test with Playwright, provide screenshot evidence |
 | `github` | haiku | Git commits, branches, pull requests |
 | `slack` | haiku | Send progress notifications to users |
@@ -73,7 +73,7 @@ Before marking ANY issue Done:
 ### Session Flow
 
 #### First Run (no .linear_project.json)
-1. Linear agent: Create project, issues, META issue, claude-progress.txt
+1. Linear agent: Create project, issues, META issue (add initial session comment)
 2. GitHub agent: Init repo, check GITHUB_REPO env var, push if configured
 3. (Optional) Start first feature with full verification flow
 
@@ -95,14 +95,13 @@ was configured.
 #### Continuation (.linear_project.json exists)
 
 **Step 1: Orient**
-- Read `claude-progress.txt` for quick context
-- Read `.linear_project.json` for IDs
+- Read `.linear_project.json` for IDs (including meta_issue_id)
 
 **Step 2: Get Status**
 Ask linear agent for:
+- Latest comment from META issue (for session context)
 - Issue counts (Done/In Progress/Todo)
 - FULL details of next issue (id, title, description, test_steps)
-- Update claude-progress.txt
 
 **Step 3: Verification Test (MANDATORY)**
 Ask coding agent:
@@ -191,6 +190,27 @@ Delegate to slack agent: "Send to #new-channel: :white_check_mark: Completed: Ti
 3. **Always pass full context** - Don't make agents re-fetch
 4. **Fix regressions first** - Never proceed if verification fails
 5. **One issue at a time** - Complete fully before starting another
+6. **Keep project root clean** - No temp files (see below)
+
+---
+
+### CRITICAL: No Temporary Files
+
+Tell the coding agent to keep the project directory clean.
+
+**Allowed in project root:**
+- Application code directories (`src/`, `frontend/`, `agent/`, etc.)
+- Config files (package.json, .gitignore, tsconfig.json, etc.)
+- `screenshots/` directory
+- `README.md`, `init.sh`, `app_spec.txt`, `.linear_project.json`
+
+**NOT allowed (delete immediately):**
+- `*_IMPLEMENTATION_SUMMARY.md`, `*_TEST_RESULTS.md`, `*_REPORT.md`
+- Standalone test scripts (`test_*.py`, `verify_*.py`, `create_*.py`)
+- Test HTML files (`test-*.html`, `*_visual.html`)
+- Output/debug files (`*_output.txt`, `demo_*.txt`)
+
+When delegating to coding agent, remind them: "Clean up any temp files before finishing."
 
 ---
 
@@ -233,7 +253,7 @@ You have finite context. Prioritize:
 
 When context is filling up or session is ending:
 1. Commit any work in progress
-2. Ask linear agent to update META issue and claude-progress.txt
+2. Ask linear agent to add session summary comment to META issue
 3. **Create PR** (if GITHUB_REPO configured): Ask github agent to create PR summarizing all work done this session
 4. End cleanly
 
