@@ -2,7 +2,7 @@
 
 **Your own AI software engineer that manages projects, writes code, and communicates progress — autonomously.**
 
-Ever wished you could hand off a feature request and have it come back fully implemented, tested, and documented? Your Claude Engineer is a harness built on top of the Anthropic Harness for long running tasks and using the [Claude Agent SDK](https://github.com/anthropics/claude-code/tree/main/agent-sdk-python) that turns Claude into a long-running software engineer capable of tackling complex, multi-step tasks that go far beyond a single prompt.
+Ever wished you could hand off a feature request and have it come back fully implemented, tested, and documented? Your Claude Engineer is a harness built on top of the Anthropic Harness for long running tasks and using the [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk-python) that turns Claude into a long-running software engineer capable of tackling complex, multi-step tasks that go far beyond a single prompt.
 
 It's a complete engineering workflow leveraging subagents to handle distinct concerns:
 
