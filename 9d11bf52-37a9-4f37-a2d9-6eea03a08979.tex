@@ -1,0 +1,3097 @@
+\documentclass[10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[version=4]{mhchem}
+\usepackage{stmaryrd}
+\usepackage{bbold}
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\graphicspath{ {./images/} }
+\usepackage{caption}
+
+\title{Linear Algebra II }
+
+\author{Richard Earl}
+\date{}
+
+
+%New command to display footnote whose markers will always be hidden
+\let\svthefootnote\thefootnote
+\newcommand\blfootnotetext[1]{%
+  \let\thefootnote\relax\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \let\thefootnote\svthefootnote%
+}
+
+%Overriding the \footnotetext command to hide the marker if its value is `0`
+\let\svfootnotetext\footnotetext
+\renewcommand\footnotetext[2][?]{%
+  \if\relax#1\relax%
+    \ifnum\value{footnote}=0\blfootnotetext{#2}\else\svfootnotetext{#2}\fi%
+  \else%
+    \if?#1\ifnum\value{footnote}=0\blfootnotetext{#2}\else\svfootnotetext{#2}\fi%
+    \else\svfootnotetext[#1]{#2}\fi%
+  \fi
+}
+
+\DeclareUnicodeCharacter{03B1}{\ifmmode\alpha\else{$\alpha$}\fi}
+
+\begin{document}
+\maketitle
+\captionsetup{singlelinecheck=false}
+Hilary Term 2026
+
+\section*{0. INTRODUCTION AND PRELIMINARY MATERIAL}
+\subsection*{0.1 Syllabus}
+Introduction to determinant of a square matrix: existence and uniqueness. Proof of existence by induction. Proof of uniqueness by deriving explicit formula from the properties of the determinant. Permutation matrices. (No general discussion of permutations). Basic properties of determinant, relation to volume. Multiplicativity of the determinant, computation by row operations. [2]
+
+Determinants and linear transformations: definition of the determinant of a linear transformation, multiplicativity, invertibility and the determinant. [0.5]
+
+Eigenvectors and eigenvalues, the characteristic polynomial, trace. Eigenvectors for distinct eigenvalues are linearly independent. Discussion of diagonalization. Examples. Eigenspaces, geometric and algebraic multiplicity of eigenvalues. Eigenspaces form a direct sum. [2.5]
+
+Gram-Schmidt procedure. Spectral theorem for real symmetric matrices. Quadratic forms and real symmetric matrices. Application of the spectral theorem to putting quadrics into normal form by orthogonal transformations and translations. [3]
+
+\subsection*{0.2 Reading list}
+(1) T. S. Blyth and E. F. Robertson, Basic Linear Algebra (Springer, London, 2nd edition 2002).\\
+(2) C. W. Curtis, Linear Algebra - An Introductory Approach (Springer, New York, 4th edition, reprinted 1994).\\
+(3) R. B. J. T. Allenby, Linear Algebra (Arnold, London, 1995).\\
+(4) D. A. Towers, A Guide to Linear Algebra (Macmillan, Basingstoke 1988).\\
+(5) S. Lang, Linear Algebra (Springer, London, Third Edition, 1987).\\
+(6) R. Earl, Towards Higher Mathematics - A Companion (Cambridge University Press, Cambridge, 2017)
+
+\subsection*{0.3 Introduction}
+Towards the end of the Linear Algebra I course, it was explained how a linear map \(T: V \rightarrow V\) can be represented, with respect to a choice of basis, by a square \(n \times n\) matrix where \(n=\operatorname{dim} V\). When we make a choice of basis \(\left\{e_{1}, \ldots, e_{n}\right\}\) for \(V\), then a vector \(v \in V\) becomes represented by a unique co-ordinate vector \(\left(c_{1}, \ldots, c_{n}\right) \in \mathbb{R}^{n}\) such that
+
+\[
+v=c_{1} e_{1}+\cdots+c_{n} e_{n}
+\]
+
+and \(T\) becomes represented by the matrix \(A=\left(a_{i j}\right)\) where
+
+\[
+T e_{i}=a_{1 i} e_{1}+\cdots+a_{n i} e_{n}
+\]
+
+Note that the co-ordinates of \(T e_{i}\) are the entries of the \(i\) th column of \(A\).\\
+Given the same linear map \(T\) can be represented by infinitely many different matrices, at least two questions arise:
+
+\begin{itemize}
+  \item What do these different matrices have in common, given they represent the same linear map?
+  \item Is there a best matrix representative - for purposes of computation or comprehension amongst all these different matrices?\\
+The second question will lead us to a discussion of eigenvectors and diagonalizability. Should we be able to find a matrix representative that is diagonal, then many calculations will be considerably simpler. If this is possible, and it is an 'if', then the linear map is said to be diagonalizable and the vectors in the basis are called eigenvectors. An eigenvector is a non-zero vector \(v\) such that \(T v=\lambda v\) for some scalar \(\lambda\) known as the eigenvalue of \(v\).
+\end{itemize}
+
+Returning to the first question, we shall find that all the algebraic properties of \(T\) apply to each of its matrix representatives. If \(A\) and \(B\) are two matrices representing \(T\) then there is an invertible matrix \(P\) such that
+
+\[
+A=P^{-1} B P .
+\]
+
+We can then show that each matrix representative has the same determinant, trace, rank, nullity, eigenvalues and functional properties - e.g. \(T\) is self-inverse. Any calculation we make, pertaining to the algebra of \(T\), reassuringly yields the same answer. The matrix \(P\) is a change of basis matrix providing an invertible change of variable.
+
+However, the same cannot be said of geometric properties of \(T\). In general, an invertible change of variable will alter lengths, angles, areas, volumes, etc.. If, say, we wish to change variables to show a curve that isn't in normal form - such as
+
+\[
+x^{2}+x y+y^{2}=1
+\]
+
+\begin{itemize}
+  \item is in fact an ellipse, and determine its area, then we need to ensure that the area remains invariant under the change of co-ordinates. The matrices that preserve the scalar product and so preserve angle, distance, area - are the orthogonal matrices. That is, \(P^{-1}=P^{T}\). It is an easy check to see that the only matrices which might be diagonalized by an orthogonal change of variable are the symmetric matrices. At the end of the course we meet the important spectral theorem which shows the converse: symmetric matrices can be diagonalized by an orthogonal change of variable.
+\end{itemize}
+
+\subsection*{0.4 Notation}
+\(\left(\mathbf{v}_{1}\left|\mathbf{v}_{2}\right| \cdots \mid \mathbf{v}_{n}\right)\) denotes the \(m \times n\) matrix with columns \(\mathbf{v}_{1}, \mathbf{v}_{2}, \ldots, \mathbf{v}_{n} \in \mathbb{R}_{\text {col }}^{m}\)\\
+\(\left(\mathbf{r}_{1} / \mathbf{r}_{2} / \cdots / \mathbf{r}_{m}\right)\) denotes the \(m \times n\) matrix with rows \(\mathbf{r}_{1}, \mathbf{r}_{2}, \ldots, \mathbf{r}_{m} \in \mathbb{R}^{n}\)\\
+\(\mathbf{e}_{1}, \mathbf{e}_{2}, \ldots, \mathbf{e}_{n}\) denotes the canonical basis for \(\mathbb{R}^{n}\).\\
+\(L_{A}\) denotes, for an \(m \times n\) matrix \(A\), the map \(\mathbb{R}_{\text {col }}^{n} \rightarrow \mathbb{R}_{\text {col }}^{m}\) given by \(\mathbf{x} \mapsto A \mathbf{x}\).\\
+\(M_{i}(\lambda)\) denotes the ERO that multiplies the \(i\) th row by \(\lambda \neq 0\).\\
+\(S_{i j}\) denotes the ERO that swaps the \(i\) th and \(j\) th rows.\\
+\(A_{i j}(\lambda)\) denotes the ERO that adds \(\lambda \times\) (row \(i\) ) to row \(j\).\\
+\(\operatorname{diag}\left(\alpha_{1}, \ldots, \alpha_{n}\right)\) denotes the diagonal \(n \times n\) matrix with entries \(\alpha_{1}, \ldots, \alpha_{n}\).\\
+\([A]_{i j}\) denotes the \((i, j)\) th entry of matrix \(A\).\\
+\(\chi_{A}(x)\) denotes the characteristic polynomial of a square matrix \(A\).\\
+\(E_{\lambda}\) denotes the eigenspace of the eigenvalue \(\lambda\).
+
+\section*{1. DETERMINANTS.}
+\subsection*{1.1 Definitions}
+A square matrix has a number associated with it called its determinant. There are various different ways of introducing determinants, each of which has its advantages but none of which is wholly ideal as will become clearer below. The definition we shall use is an inductive one, defining the determinant of an \(n \times n\) matrix in terms of \((n-1) \times(n-1)\) determinants. Quite what the determinant of a matrix signifies will be discussed shortly in Remark 11.
+
+Notation 1 Given a square matrix \(A\) and \(1 \leqslant I, J \leqslant n\), we write \(A_{I J}\) for the \((n-1) \times(n-1)\) matrix formed by removing the \(I\) th row and the \(J\) th column from \(A\).
+
+Example 2 Let
+
+\[
+A=\left(\begin{array}{ccc}
+1 & -3 & 2 \\
+0 & 7 & 1 \\
+-5 & 1 & 3
+\end{array}\right)
+\]
+
+Then (a) removing the 2 nd row and 3 rd column or (b) removing the 3 rd row and 1 st column, we get
+
+\[
+\text { (a) } \quad A_{23}=\left(\begin{array}{cc}
+1 & -3 \\
+-5 & 1
+\end{array}\right) ; \quad \text { (b) } \quad A_{31}=\left(\begin{array}{cc}
+-3 & 2 \\
+7 & 1
+\end{array}\right) \text {. }
+\]
+
+Our inductive definition of a determinant is then:\\
+Definition 3 The determinant of a \(1 \times 1\) matrix ( \(a_{11}\) ) is simply \(a_{11}\) itself. The determinant \(\operatorname{det} A\) of an \(n \times n\) matrix \(A=\left(a_{i j}\right)\) is then given by
+
+\[
+\operatorname{det} A=a_{11} \operatorname{det} A_{11}-a_{21} \operatorname{det} A_{21}+a_{31} \operatorname{det} A_{31}-\cdots+(-1)^{n+1} a_{n 1} \operatorname{det} A_{n 1} .
+\]
+
+Notation 4 The determinant of a square matrix \(A\) is denoted as \(\operatorname{det} A\) and also sometimes as \(|A|\). So we may also write the determinant of the matrix \(A\) in Example 2 as
+
+\[
+\left|\begin{array}{ccc}
+1 & -3 & 2 \\
+0 & 7 & 1 \\
+-5 & 1 & 3
+\end{array}\right|
+\]
+
+Proposition 5 The determinants of \(2 \times 2\) and \(3 \times 3\) matrices are given by the following formulae.\\
+(a) For \(2 \times 2\) matrices
+
+\[
+\left|\begin{array}{ll}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{array}\right|=a_{11} a_{22}-a_{12} a_{21}
+\]
+
+(b) For \(3 \times 3\) matrices
+
+\[
+\left|\begin{array}{lll}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{32} & a_{33}
+\end{array}\right|=a_{11} a_{22} a_{33}+a_{12} a_{23} a_{31}+a_{13} a_{21} a_{32}-a_{12} a_{21} a_{33}-a_{13} a_{22} a_{31}-a_{11} a_{23} a_{32}
+\]
+
+Proof. (a) Applying the above inductive definition, we have \(\operatorname{det} A_{11}=\operatorname{det}\left(a_{22}\right)=a_{22}\) and \(\operatorname{det} A_{21}=\operatorname{det}\left(a_{12}\right)=a_{12}\), so that
+
+\[
+\left|\begin{array}{ll}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{array}\right|=a_{11} \operatorname{det} A_{11}-a_{21} \operatorname{det} A_{21}=a_{11} a_{22}-a_{12} a_{21}
+\]
+
+(b) For the \(3 \times 3\) case
+
+\[
+\operatorname{det} A_{11}=\left|\begin{array}{cc}
+a_{22} & a_{23} \\
+a_{32} & a_{33}
+\end{array}\right|, \quad \operatorname{det} A_{21}=\left|\begin{array}{cc}
+a_{12} & a_{13} \\
+a_{32} & a_{33}
+\end{array}\right|, \quad \operatorname{det} A_{31}=\left|\begin{array}{cc}
+a_{12} & a_{13} \\
+a_{22} & a_{23}
+\end{array}\right|,
+\]
+
+so that
+
+\[
+\begin{aligned}
+\left|\begin{array}{lll}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{32} & a_{33}
+\end{array}\right| & =a_{11}\left|\begin{array}{cc}
+a_{22} & a_{23} \\
+a_{32} & a_{33}
+\end{array}\right|-a_{21}\left|\begin{array}{cc}
+a_{12} & a_{13} \\
+a_{32} & a_{33}
+\end{array}\right|+a_{31}\left|\begin{array}{cc}
+a_{12} & a_{13} \\
+a_{22} & a_{23}
+\end{array}\right| \\
+& =a_{11}\left(a_{22} a_{33}-a_{23} a_{32}\right)-a_{21}\left(a_{12} a_{33}-a_{13} a_{32}\right)+a_{31}\left(a_{12} a_{23}-a_{13} a_{22}\right)
+\end{aligned}
+\]
+
+using the formula for \(2 \times 2\) determinants. This rearranges to (1.1).
+
+Example 6 Let \(R_{\theta}\) and \(S_{\theta}\) be the rotation and reflection matrices
+
+\[
+R_{\theta}=\left(\begin{array}{cc}
+\cos \theta & -\sin \theta \\
+\sin \theta & \cos \theta
+\end{array}\right), \quad S_{\theta}=\left(\begin{array}{cc}
+\cos 2 \theta & \sin 2 \theta \\
+\sin 2 \theta & -\cos 2 \theta
+\end{array}\right)
+\]
+
+\(R_{\theta}\) represents rotation by \(\theta\) anti-clockwise about the origin and \(S_{\theta}\) represents reflection in the line \(y=\tan \theta\). Note, for any \(\theta\), that
+
+\[
+\operatorname{det} R_{\theta}=\cos ^{2} \theta+\sin ^{2} \theta=1, \quad \operatorname{det} S_{\theta}=-\cos ^{2} 2 \theta-\sin ^{2} 2 \theta=-1
+\]
+
+Example 7 Returning to the matrix from Example 2, we have
+
+\[
+\begin{aligned}
+\left|\begin{array}{ccc}
+1 & -3 & 2 \\
+0 & 7 & 1 \\
+-5 & 1 & 3
+\end{array}\right|= & \underbrace{1 \times 7 \times 3}_{21}+\underbrace{(-3) \times 1 \times(-5)}_{15}+\underbrace{2 \times 0 \times 1}_{0} \\
+& -\underbrace{1 \times 1 \times 1}_{1}-\underbrace{(-3) \times 0 \times 3}_{0}-\underbrace{2 \times 7 \times(-5)}_{-70} \\
+= & 105
+\end{aligned}
+\]
+
+Remark 8 In the \(2 \times 2\) and \(3 \times 3\) cases, but only in these cases, there is a simple way to remember the determinant formula. The \(2 \times 2\) formula is the product of entries on the left-toright diagonal minus the product of those on the right-to-left diagonals. If, in the \(3 \times 3\) case, we allow diagonals to 'wrap around' the vertical sides of the matrix-for example as below
+
+\[
+\left(\begin{array}{lll} 
+& \searrow & \\
+& & \searrow \\
+\searrow & &
+\end{array}\right), \quad\left(\begin{array}{lll}
+\swarrow & & \\
+& & \swarrow \\
+& \swarrow &
+\end{array}\right),
+\]
+
+\begin{itemize}
+  \item then from this point of view a \(3 \times 3\) matrix has three left-to-right diagonals and three right-toleft. A \(3 \times 3\) determinant then equals the sum of the products of entries on the three left-to-right diagonals minus the products from the three right-to-left diagonals. This method of calculation does not apply to \(n \times n\) determinants when \(n \geqslant 4\).
+\end{itemize}
+
+Definition 9 Let \(A\) be an \(n \times n\) matrix. Given \(1 \leqslant I, J \leqslant n\) the \((I, J)\) th cofactor of \(A\), denoted \(C_{I J}(A)\) or just \(C_{I J}\), is defined as \(C_{I J}=(-1)^{I+J} \operatorname{det} A_{I J}\) and so the determinant \(\operatorname{det} A\) can be rewritten as
+
+\[
+\operatorname{det} A=a_{11} C_{11}+a_{21} C_{21}+\cdots+a_{n 1} C_{n 1} .
+\]
+
+Proposition 10 Let \(A\) be a triangular matrix. Then \(\operatorname{det} A\) equals the product of the diagonal entries of \(A\). In particular it follows that \(\operatorname{det} I_{n}=1\) for any \(n\).
+
+Proof. This is left to Sheet 1, S3.\\
+Remark 11 (Summary of Determinant's Properties) As commented earlier, there are different ways to introduce determinants, each with their own particular advantages and disadvantages.
+
+\begin{itemize}
+  \item With Definition 3, the determinant of an \(n \times n\) matrix is at least unambiguously and relatively straightforwardly given. There are other (arguably more natural) definitions which require some initial work to show that they're well-defined. For example, we shall see that det has the following algebraic properties\\
+(i) det is linear in the rows (or columns) of a matrix (see Theorem 13(A)).\\
+(ii) if a matrix has two equal rows then its determinant is zero (see Theorem 13(B)).\\
+(iii) \(\operatorname{det} I_{n}=1\).
+\end{itemize}
+
+In fact, these three algebraic properties uniquely characterize a function \(\operatorname{det}\) which assigns a number to each \(n \times n\) matrix (Proposition 26). As a consequence of this uniqueness it also follows that\\
+(*) \(\operatorname{det} A^{T}=\operatorname{det} A\) for any square matrix \(A\) (see Corollary 20).\\
+The problem with the above approach is that the existence and uniqueness of such a function are still moot.
+
+\begin{itemize}
+  \item Using Definition 3 we avoid these issues, but unfortunately we currently have no real sense of what the determinant might convey about a matrix. The determinant of a \(2 \times 2\) matrix is uniquely characterized by the two following geometric properties. Given a \(2 \times 2\) matrix \(A\), with associated map \(L_{A}\), it is then the case that\\
+(a) for any region \(S\) of the xy-plane, we have
+\end{itemize}
+
+\[
+\text { area of } L_{A}(S)=|\operatorname{det} A| \times(\text { area of } S) \text {. }
+\]
+
+(b) The sense of any angle under \(L_{A}\) is reversed when \(\operatorname{det} A<0\) but remains the same when \(\operatorname{det} A>0\).\\
+We can demonstrate (a) and (b) by noting that the Jacobian of
+
+\[
+L_{A}\binom{x}{y}=\left(\begin{array}{ll}
+a & b \\
+c & d
+\end{array}\right)\binom{x}{y}=\binom{a x+b y}{c x+d y}
+\]
+
+equals
+
+\[
+\frac{\partial\left(f_{1}, f_{2}\right)}{\partial(x, y)}=\left|\begin{array}{ll}
+a & b \\
+c & d
+\end{array}\right|
+\]
+
+These two properties best show the significance of determinants. Thinking along these lines, the following properties should seem natural enough:\\
+(α) \(\operatorname{det} A B=\operatorname{det} A \operatorname{det} B\) (Corollary 19).\\
+( \(\beta\) ) a square matrix is singular if and only it has zero determinant (Corollary 18).\\
+However, whilst these geometric properties might better motivate the importance of determinants, they would be less useful in calculating determinants. Their meaning would also be less clear if we were working in more than three dimensions (at least until we had defined volume and sense/orientation in higher dimensions) or if we were dealing with matrices with complex numbers as entries.
+
+\begin{itemize}
+  \item The current definition appears to lend some importance to the first column; Definition 3 is sometimes referred to as expansion along the first column. From Sheet 1, P1 one might (rightly) surmise that determinants can be calculated by expanding along any row or column (Theorem 28).
+  \item Finally, calculation is difficult and inefficient using Definition 3. (For example, the formula for an \(n \times n\) determinant involves the sum of \(n\) ! separate products (Propositions 26 and 27(b)). We shall, in due course, see that a much better way to calculate determinants is via EROs. This method works well with specific examples but less well in general as too many special cases arise; if we chose to define determinants this way, even determining the general formulae for \(2 \times 2\) and \(3 \times 3\) determinants would become something of a chore.
+\end{itemize}
+
+In the following we rigorously develop the theory of determinants. These proofs are often technical and not particularly illuminating and only a selection of the proofs will be covered in lectures. I'd suggest the significant properties of determinants are (i), (ii), (iii), (*), (a), (b), \((\alpha),(\beta)\) above and these should be committed to memory. The next significant result (or method) appears in Remark 21 where we begin the discussion of calculating determinants efficiently.
+
+Notation 12 (a) We shall write ( \(\mathbf{r}_{1} / \cdots / \mathbf{r}_{n}\) ) for the \(n \times n\) matrix with rows \(\mathbf{r}_{1}, \cdots, \mathbf{r}_{n} \in \mathbb{R}^{n}\).\\
+(b) We shall write \(\left(\mathbf{v}_{1}|\cdots| \mathbf{v}_{n}\right)\) for the \(n \times n\) matrix with columns \(\mathbf{v}_{1}, \cdots, \mathbf{v}_{n} \in \mathbb{R}_{\text {col }}^{n}\).\\
+(c) We shall write \(\mathbf{e}_{1}, \ldots, \mathbf{e}_{n}\) for the standard basis of \(\mathbb{R}^{n}\).
+
+Theorem 13 The map det defined in Definition 3 has the following properties.\\
+(A) \(\operatorname{det}\) is linear in each row. That is, \(\operatorname{det} C=\lambda \operatorname{det} A+\mu \operatorname{det} B\) where
+
+\[
+\begin{aligned}
+A & =\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{i-1} / \mathbf{r}_{i} / \mathbf{r}_{i+1} / \cdots / \mathbf{r}_{n}\right) \\
+B & =\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{i-1} / \mathbf{v} / \mathbf{r}_{i+1} / \cdots / \mathbf{r}_{n}\right) \\
+C & =\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{i-1} / \lambda \mathbf{r}_{i}+\mu \mathbf{v} / \mathbf{r}_{i+1} / \cdots / \mathbf{r}_{n}\right)
+\end{aligned}
+\]
+
+(B) If \(A=\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{n}\right)\) with \(\mathbf{r}_{i}=\mathbf{r}_{j}\) for some \(i \neq j\), then \(\operatorname{det} A=0\).\\
+( \(B^{\prime}\) ) If the matrix \(B\) is produced by swapping two different rows of \(A\) then \(\operatorname{det} B=-\operatorname{det} A\).\\
+Before proceeding to the main proof we will first prove the following.\\
+Lemma 14 Together, properties \((A)\) and \((B)\) are equivalent to properties \((A)\) and \(\left(B^{\prime}\right)\).\\
+Proof. Suppose that det has properties (A), (B). Let \(A=\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{n}\right)\) and \(B\) be produced by swapping rows \(i\) and \(j\) where \(i<j\). Then
+
+\[
+\begin{aligned}
+0= & \operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{i}+\mathbf{r}_{j} / \cdots / \mathbf{r}_{i}+\mathbf{r}_{j} / \cdots / \mathbf{r}_{n}\right) \quad[\text { by (B) }] \\
+= & \operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{i} / \cdots / \mathbf{r}_{i}+\mathbf{r}_{j} / \cdots / \mathbf{r}_{n}\right)+\operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{j} / \cdots / \mathbf{r}_{i}+\mathbf{r}_{j} / \cdots / \mathbf{r}_{n}\right) \\
+= & \left\{\operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{i} / \cdots / \mathbf{r}_{i} / \cdots / \mathbf{r}_{n}\right)+\operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{i} / \cdots / \mathbf{r}_{j} / \cdots / \mathbf{r}_{n}\right)\right\} \\
+& +\left\{\operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{j} / \cdots / \mathbf{r}_{i} / \cdots / \mathbf{r}_{n}\right)+\operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{j} / \cdots / \mathbf{r}_{j} / \cdots / \mathbf{r}_{n}\right)\right\} \quad[\text { by (A) }] \\
+= & \{0+\operatorname{det} A\}+\{\operatorname{det} B+0\} \quad[\text { by (B) }] \\
+= & \operatorname{det} A+\operatorname{det} B
+\end{aligned}
+\]
+
+and so property ( \(\mathrm{B}^{\prime}\) ) follows.\\
+Conversely, if det has properties (A), (B') and \(\mathbf{r}_{i}=\mathbf{r}_{j}\) for \(i \neq j\) then
+
+\[
+\operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{i} / \cdots / \mathbf{r}_{j} / \cdots / \mathbf{r}_{n}\right)=\operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{j} / \cdots / \mathbf{r}_{i} / \cdots / \mathbf{r}_{n}\right),
+\]
+
+as the two matrices are equal, but by property ( \(\mathrm{B}^{\prime}\) )
+
+\[
+\operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{i} / \cdots / \mathbf{r}_{j} / \cdots / \mathbf{r}_{n}\right)=-\operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{j} / \cdots / \mathbf{r}_{i} / \cdots / \mathbf{r}_{n}\right),
+\]
+
+so that both determinants are in fact zero.\\
+We continue now with the proof of Theorem 13.\\
+Proof. (A) If \(n=1\) then (A) equates to the identity \(\left(\lambda a_{11}+\mu v_{1}\right)=\lambda\left(a_{11}\right)+\mu\left(v_{1}\right)\). As an inductive hypothesis, suppose that (A) is true for \((n-1) \times(n-1)\) matrices. We are looking to show that the \(n \times n\) determinant function is linear in the \(i\) th row. Note, for \(j \neq i\), that \(C_{j 1}(C)=\lambda C_{j 1}(A)+\mu C_{j 1}(B)\) by our inductive hypothesis as these cofactors relate to\\
+\((n-1) \times(n-1)\) determinants. Also \(C_{i 1}(C)=C_{i 1}(A)=C_{i 1}(B)\) as \(C_{i 1}\) is independent of the \(i\) th row. Hence
+
+\[
+\begin{aligned}
+\operatorname{det} C & =a_{11} C_{11}(C)+\cdots+\left(\lambda a_{i 1}+\mu v_{1}\right) C_{i 1}(C)+\cdots+a_{n 1} C_{n 1}(C) \\
+& =a_{11}\left(\lambda C_{11}(A)+\mu C_{11}(B)\right)+\cdots+\lambda a_{i 1} C_{i 1}(A)+\mu v_{1} C_{i 1}(B)+\cdots+a_{n 1}\left(\lambda C_{n 1}(A)+\mu C_{n 1}(B)\right) \\
+& =\lambda\left\{a_{11} C_{11}(A)+\cdots+a_{n 1} C_{n 1}(A)\right\}+\mu\left\{a_{11} C_{11}(B)+\cdots+v_{1} C_{i 1}(B)+\cdots+a_{n 1} C_{n 1}(B)\right\} \\
+& =\lambda \operatorname{det} A+\mu \operatorname{det} B
+\end{aligned}
+\]
+
+We have therefore proved (A) for all square matrices. In what follows, note that if (B) is true of certain matrices then so is ( \(\mathrm{B}^{\prime}\) ) as we have shown that ( A ) and ( B ) are equivalent to (A) and (B').\\
+(B) For a \(2 \times 2\) matrix, if \(\mathbf{r}_{1}=\mathbf{r}_{2}\) then
+
+\[
+\operatorname{det} A=\left(\begin{array}{ll}
+a_{11} & a_{12} \\
+a_{11} & a_{12}
+\end{array}\right)=a_{11} a_{12}-a_{12} a_{11}=0 .
+\]
+
+So (B) (and hence ( \(\mathrm{B}^{\prime}\) )) hold for \(2 \times 2\) matrices. Assume now that ( B ) (or equivalently ( \(\mathrm{B}^{\prime}\) )) is true for \((n-1) \times(n-1)\) matrices. Let \(A=\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{n}\right)\) with \(\mathbf{r}_{i}=\mathbf{r}_{j}\) where \(i<j\). Then
+
+\[
+\operatorname{det} A=a_{11} C_{11}(A)+\cdots+a_{n 1} C_{n 1}(A)=a_{i 1} C_{i 1}(A)+a_{j 1} C_{j 1}(A)
+\]
+
+by the inductive hypothesis as \(A_{k 1}\) has two equal rows when \(k \neq i, j\). Note that as \(\mathbf{r}_{i}=\mathbf{r}_{j}\), with one copy of each being removed from \(A_{i 1}\) and \(A_{j 1}\), then the rows of \(A_{i 1}\) are the same as the rows of \(A_{j 1}\) but come in a different order. The rows of \(A_{i 1}\) and \(A_{j i}\) can be reordered to be the same as follows: what remains of \(\mathbf{r}_{j}\) in \(A_{i 1}\) can be moved up to the position of \(\mathbf{r}_{i}\) 's remainder in \(A_{j 1}\) by swapping it \(j-i-1\) times, each time with the next row above. (Note that we cannot simply swap the rows \(\mathbf{r}_{i}\) and \(\mathbf{r}_{j}\) in \(A\) to show \(\operatorname{det} A=0\) as this would be assuming ( \(\mathrm{B}^{\prime}\) ) for \(n \times n\) matrices which is equivalent to what we're trying to prove.) By our inductive hypothesis
+
+\[
+\begin{aligned}
+\operatorname{det} A & =a_{i 1} C_{i 1}(A)+a_{j 1} C_{j 1}(A) \\
+& =(-1)^{1+i} a_{i 1} \operatorname{det} A_{i 1}+(-1)^{1+j} a_{j 1} \operatorname{det} A_{j 1} \quad[\text { by definition of cofactors }] \\
+& =(-1)^{1+i} a_{i 1}(-1)^{j-i-1} \operatorname{det} A_{j 1}+(-1)^{1+j} a_{j 1} \operatorname{det} A_{j 1} \quad\left[\text { by } j-i-1 \text { uses of }\left(\mathrm{B}^{\prime}\right)\right] \\
+& =(-1)^{j}\left(a_{i 1}-a_{j 1}\right) \operatorname{det} A_{j 1}=0 \quad\left[\text { as } a_{i 1}=a_{j 1} \text { because } \mathbf{r}_{i}=\mathbf{r}_{j}\right]
+\end{aligned}
+\]
+
+Hence (B) is true for \(n \times n\) determinants and the result follows by induction.\\
+Corollary 15 Let \(A\) be an \(n \times n\) matrix and \(\lambda\) a real number.\\
+(a) If the matrix \(B\) is formed by multiplying a row of \(A\) by \(\lambda\) then \(\operatorname{det} B=\lambda \operatorname{det} A\).\\
+(b) \(\operatorname{det}(\lambda A)=\lambda^{n} \operatorname{det} A\).\\
+(c) If any row of \(A\) is zero then \(\operatorname{det} A=0\).
+
+Proof. (a) This follows from the fact that det is linear in its rows, and then if (a) is applied consecutively to each of the \(n\) rows part (b) follows. Finally if \(\mathbf{r}_{i}=\mathbf{0}\) for some \(i\), then \(\mathbf{r}_{i}=0 \mathbf{r}_{i}\) and so (c) follows from part (a).
+
+Notation 16 We will denote the three EROs as:\\
+(a) \(M_{i}(\lambda)\) denotes multiplication of the ith row by \(\lambda \neq 0\).\\
+(b) \(S_{i j}\) denotes swapping the \(i\) th and \(j\) th rows.\\
+(c) \(A_{i j}(\lambda)\) denotes adding \(\lambda \times\) (row \(i\) ) to row \(j\).
+
+Lemma 17 (a) The determinants of the elementary matrices are
+
+\[
+\operatorname{det} M_{i}(\lambda)=\lambda ; \quad \operatorname{det} S_{i j}=-1 ; \quad \operatorname{det} A_{i j}(\lambda)=1 .
+\]
+
+In particular, elementary matrices have non-zero determinants.\\
+(b) If \(E, A\) are \(n \times n\) matrices and \(E\) is elementary then \(\operatorname{det} E A=\operatorname{det} E \operatorname{det} A\).\\
+(c) If \(E\) is an elementary matrix then \(\operatorname{det} E^{T}=\operatorname{det} E\).
+
+Proof. We shall prove (a) and (b) together. If \(E=M_{i}(\lambda)\) and then \(\operatorname{det} E A=\lambda \operatorname{det} A\) by Corollary 15(a). If we choose \(A=I_{n}\) then we find \(\operatorname{det} M_{i}(\lambda)=\lambda\) and so we also have \(\operatorname{det} E A=\operatorname{det} E \operatorname{det} A\) when \(E=M_{i}(\lambda)\).
+
+If \(E=S_{i j}\) then by Theorem 13(B') \(\operatorname{det} E A=-\operatorname{det} A\). If we take \(A=I_{n}\) then we see \(\operatorname{det} S_{i j}=-1\) and then we also have \(\operatorname{det} E A=\operatorname{det} E \operatorname{det} A\) when \(E=S_{i j}\).
+
+If \(E=A_{i j}(\lambda)\) and \(A=\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{n}\right)\) then
+
+\[
+\begin{aligned}
+\operatorname{det}(E A) & =\operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{i}+\lambda \mathbf{r}_{j} / \cdots / \mathbf{r}_{j} / \cdots / \mathbf{r}_{n}\right) \\
+& =\operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{i} / \cdots / \mathbf{r}_{j} / \cdots / \mathbf{r}_{n}\right)+\lambda \operatorname{det}\left(\mathbf{r}_{1} / \cdots / \mathbf{r}_{j} / \cdots / \mathbf{r}_{j} / \cdots / \mathbf{r}_{n}\right) \\
+& =\operatorname{det} A+0 \\
+& =\operatorname{det} A
+\end{aligned}
+\]
+
+The second equality follows from Theorem \(13(\mathrm{~A})\), and the third from Theorem \(13(\mathrm{~B})\). If we take \(A=I_{n}\) then \(\operatorname{det} A_{i j}(\lambda)=1\) and so \(\operatorname{det} E A=\operatorname{det} E \operatorname{det} A\) also follows when \(E=A_{i j}(\lambda)\).\\
+(c) Note that \(M_{i}(\lambda)\) and \(S_{i j}\) are symmetric and so there is nothing to prove in these cases. Finally
+
+\[
+\operatorname{det}\left(A_{i j}(\lambda)^{T}\right)=\operatorname{det} A_{j i}(\lambda)=1=\operatorname{det} A_{i j}(\lambda)
+\]
+
+Corollary 18 (Criterion for Invertibility) \(A\) square matrix \(A\) is invertible if and only if \(\operatorname{det} A \neq 0\), in which case \(\operatorname{det}\left(A^{-1}\right)=(\operatorname{det} A)^{-1}\).
+
+Proof. If \(A\) is invertible then it row-reduces to the identity; that is, there are elementary matrices \(E_{1}, \ldots, E_{k}\) such that \(E_{k} \cdots E_{1} A=I\). Hence, by repeated use of Lemma 17(b),
+
+\[
+1=\operatorname{det} I=\operatorname{det} E_{k} \times \cdots \times \operatorname{det} E_{1} \times \operatorname{det} A
+\]
+
+In particular \(\operatorname{det} A \neq 0\). Further as \(E_{k} \cdots E_{1}=A^{-1}\) then \(\operatorname{det}\left(A^{-1}\right)=(\operatorname{det} A)^{-1}\). If, however, \(A\) is singular then \(A\) reduces to a matrix \(R\) with at least one zero row so that \(\operatorname{det} R=0\). So as before
+
+\[
+\operatorname{det} E_{k} \times \cdots \times \operatorname{det} E_{1} \times \operatorname{det} A=\operatorname{det} R=0
+\]
+
+for some elementary matrices \(E_{i}\). As \(\operatorname{det} E_{i} \neq 0\) for each \(i\), it follows that \(\operatorname{det} A=0\).
+
+Corollary 19 (Product Rule for Determinants) Let \(A, B\) be \(n \times n\) matrices. Then
+
+\[
+\operatorname{det} A B=\operatorname{det} A \operatorname{det} B
+\]
+
+Proof. If \(A\) and \(B\) are invertible then they can be written as products of elementary matrices; say \(A=E_{1} \ldots E_{k}\) and \(B=F_{1} \ldots F_{l}\). Then
+
+\[
+\operatorname{det} A B=\operatorname{det} E_{1} \times \cdots \times \operatorname{det} E_{k} \times \operatorname{det} F_{1} \times \cdots \times \operatorname{det} F_{l}=\operatorname{det} A \operatorname{det} B
+\]
+
+by Lemma 17(b). Otherwise one (or both) of \(A\) or \(B\) is singular. Then \(A B\) is singular and so \(\operatorname{det} A B=0\). But, also \(\operatorname{det} A \times \operatorname{det} B=0\) as one or both of \(A, B\) is singular.
+
+Corollary 20 (Transpose Rule for Determinants) Let \(A\) be a square matrix. Then
+
+\[
+\operatorname{det} A^{T}=\operatorname{det} A
+\]
+
+Proof. \(A\) is invertible if and only if \(A^{T}\) is invertible. If \(A\) is invertible then \(A=E_{1} \ldots E_{k}\) for some elementary matrices \(E_{i}\). Now \(A^{T}=E_{k}^{T} \cdots E_{1}^{T}\) by the product rule for transposes and so, by Lemma 17(c) and the product rule above,
+
+\[
+\operatorname{det} A^{T}=\operatorname{det} E_{k}^{T} \times \cdots \times \operatorname{det} E_{1}^{T}=\operatorname{det} E_{k} \times \cdots \times \operatorname{det} E_{1}=\operatorname{det} A .
+\]
+
+If \(A\) is singular then so is \(A^{T}\) and so \(\operatorname{det} A=0=\operatorname{det} A^{T}\).\\
+Remark 21 Currently we are still lumbered with a very inefficient way of evaluating determinants in Definition 3. That definition is practicable up to \(3 \times 3\) matrices but rapidly becomes laborious after that. A much more efficient way to calculate determinants is using EROs and ECOs, and we have been in a position to do this since showing \(\operatorname{det} E A=\operatorname{det} E \times \operatorname{det} A\) for elementary E. An ECO involves postmultiplication by an elementary matrix but the product rule shows they will have the same effects on the determinant. Spelling this out:
+
+\begin{itemize}
+  \item Adding a multiple of a row (resp. column) to another row (resp. column) has no effect on a determinant.
+  \item Multiplying a row or column of the determinant by a scalar \(\lambda\) multiplies the determinant by \(\lambda\).
+  \item Swapping two rows or two columns of a determinant multiplies the determinant by -1 .
+\end{itemize}
+
+The following examples will hopefully make clear how to efficiently calculate determinants using EROs and ECOs.
+
+Example 22 Use EROs and ECOs to calculate the following \(4 \times 4\) determinants.
+
+\[
+\left|\begin{array}{cccc}
+1 & 2 & 0 & 3 \\
+4 & -3 & 1 & 0 \\
+0 & 2 & 5 & -1 \\
+2 & 3 & 1 & 2
+\end{array}\right|, \quad\left|\begin{array}{cccc}
+2 & 2 & 1 & -3 \\
+0 & 6 & -2 & 1 \\
+3 & 2 & 1 & 1 \\
+4 & 2 & -1 & 2
+\end{array}\right| .
+\]
+
+\section*{Solution.}
+\[
+\begin{aligned}
+\left|\begin{array}{cccc}
+1 & 2 & 0 & 3 \\
+4 & -3 & 1 & 0 \\
+0 & 2 & 5 & -1 \\
+2 & 3 & 1 & 2
+\end{array}\right| & =\left|\begin{array}{cccc}
+1 & 2 & 0 & 3 \\
+0 & -11 & 1 & -12 \\
+0 & 2 & 5 & -1 \\
+0 & -1 & 1 & -4
+\end{array}\right|=\left|\begin{array}{ccc}
+-11 & 1 & -12 \\
+2 & 5 & -1 \\
+-1 & 1 & -4
+\end{array}\right| \\
+& =\left|\begin{array}{ccc}
+0 & -10 & 32 \\
+0 & 7 & -9 \\
+-1 & 1 & -4
+\end{array}\right|=-1 \times\left|\begin{array}{cc}
+-10 & 32 \\
+7 & -9
+\end{array}\right|=134,
+\end{aligned}
+\]
+
+where, in order, we (i) add appropriate multiples of the row 1 to lower rows to clear the rest of column 1, (ii) expand along column 1, (iii) add appropriate multiples of row 3 to rows 1 and 2 to clear the rest of column 1, (iv) expand along column 1 and (v) employ the \(2 \times 2\) determinant formula.
+
+\[
+\begin{aligned}
+\left|\begin{array}{cccc}
+2 & 2 & 1 & -3 \\
+0 & 6 & -2 & 1 \\
+3 & 2 & 1 & 1 \\
+4 & 2 & -1 & 2
+\end{array}\right| & =\left|\begin{array}{cccc}
+2 & 2 & 1 & -3 \\
+0 & 6 & -2 & 1 \\
+0 & -1 & -\frac{1}{2} & \frac{11}{2} \\
+0 & -2 & -3 & 8
+\end{array}\right|=2\left|\begin{array}{ccc}
+6 & -2 & 1 \\
+-1 & -\frac{1}{2} & \frac{11}{2} \\
+-2 & -3 & 8
+\end{array}\right| \\
+& =2\left|\begin{array}{ccc}
+0 & -5 & 34 \\
+-1 & -\frac{1}{2} & \frac{11}{2} \\
+0 & -2 & -3
+\end{array}\right|=2\left|\begin{array}{cc}
+-5 & 34 \\
+-2 & -3
+\end{array}\right|=166
+\end{aligned}
+\]
+
+where, in order, we (i) add appropriate multiples of row 1 to lower rows to clear the rest of column 1, (ii) expand along column 1, (iii) add appropriate multiples of row 2 to rows 1 and 3 to clear the rest of column 1 , (iv) expand along column 1 and (v) employ the \(2 \times 2\) determinant formula.
+
+Alternatively, for this second determinant, it may have made more sense to column-reduce as the third column has a helpful leading 1 and we could have instead calculated the determinant as follows.
+
+\[
+\begin{aligned}
+\left|\begin{array}{cccc}
+2 & 2 & 1 & -3 \\
+0 & 6 & -2 & 1 \\
+3 & 2 & 1 & 1 \\
+4 & 2 & -1 & 2
+\end{array}\right| & =\left|\begin{array}{cccc}
+0 & 0 & 1 & 0 \\
+4 & 10 & -2 & -5 \\
+1 & 0 & 1 & 4 \\
+6 & 4 & -1 & -1
+\end{array}\right|=\left|\begin{array}{ccc}
+4 & 10 & -5 \\
+1 & 0 & 4 \\
+6 & 4 & -1
+\end{array}\right| \\
+& =\left|\begin{array}{ccc}
+0 & 10 & -21 \\
+1 & 0 & 4 \\
+0 & 4 & -25
+\end{array}\right|=-\left|\begin{array}{cc}
+10 & -21 \\
+4 & -25
+\end{array}\right|=166
+\end{aligned}
+\]
+
+where, in order, we (i) add appropriate multiples of column 3 to other columns to clear the rest of row 1, (ii) expand along row 1 (iii) add appropriate multiples of row 2 to rows 1 and 3 to clear the rest of column 1 , (iv) expand along column 1 and (v) employ the \(2 \times 2\) determinant formula.
+
+\begin{itemize}
+  \item We will demonstrate in Theorem 28 the as-yet-unproven equivalence of expanding along any row or column.
+\end{itemize}
+
+Example 23 Let \(a, x\) be real numbers. Determine the following \(3 \times 3\) and \(n \times n\) determinants.
+
+\[
+\text { (a) }\left|\begin{array}{ccc}
+x & a & a \\
+x & x & a \\
+x & x & x
+\end{array}\right|, \quad \text { (b) }\left|\begin{array}{cccc}
+x & 1 & \cdots & 1 \\
+1 & x & \cdots & 1 \\
+\vdots & \vdots & \ddots & \vdots \\
+1 & 1 & \cdots & x
+\end{array}\right| \text {. }
+\]
+
+Solution. (a) Subtracting row 3 from the other rows, and expanding along column 1, we obtain
+
+\[
+\left|\begin{array}{ccc}
+x & a & a \\
+x & x & a \\
+x & x & x
+\end{array}\right|=\left|\begin{array}{ccc}
+0 & a-x & a-x \\
+0 & 0 & a-x \\
+x & x & x
+\end{array}\right|=x\left|\begin{array}{cc}
+a-x & a-x \\
+0 & a-x
+\end{array}\right|=x(a-x)^{2} .
+\]
+
+Similarly for (b) if we note that the sum of each column is the same and then add the bottom \(n-1\) rows to the first row (which won't affect the determinant), we see it equals
+
+\[
+\begin{aligned}
+& \left|\begin{array}{cccc}
+x+n-1 & x+n-1 & \cdots & x+n-1 \\
+1 & x & \cdots & 1 \\
+\vdots & \vdots & \ddots & \vdots \\
+1 & 1 & \cdots & x
+\end{array}\right| \\
+= & (x+n-1)\left|\begin{array}{cccc}
+1 & 1 & \cdots & 1 \\
+1 & x & \cdots & 1 \\
+\vdots & \vdots & \ddots & \vdots \\
+1 & 1 & \cdots & x
+\end{array}\right| \\
+= & (x+n-1)\left|\begin{array}{cccc}
+1 & 1 & \cdots & 1 \\
+0 & x-1 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & x-1
+\end{array}\right|
+\end{aligned}
+\]
+
+where, in order, we (i) take the common factor of \(x+n-1\) out of the first row, (ii) subtract the first row from each of the other rows, (iii) note the determinant is upper triangular to finally obtain a result of \((x+n-1)(x-1)^{n-1}\). \(\square\)
+
+We conclude this section by defining the Vandermonde \({ }^{1}\) determinant useful in interpolation.\\
+Example 24 (Vandermonde Matrix) For \(n \geqslant 2\) and real numbers \(x_{1}, \ldots, x_{n}\) we define
+
+\[
+V_{n}=\left(\begin{array}{ccccc}
+1 & x_{1} & x_{1}^{2} & \cdots & x_{1}^{n-1} \\
+1 & x_{2} & x_{2}^{2} & \cdots & x_{2}^{n-1} \\
+1 & x_{3} & x_{3}^{2} & \cdots & x_{3}^{n-1} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+1 & x_{n} & x_{n}^{2} & \cdots & x_{n}^{n-1}
+\end{array}\right) \quad \text { and then } \quad \operatorname{det} V_{n}=\prod_{i>j}\left(x_{i}-x_{j}\right) .
+\]
+
+In particular, \(V_{n}\) is invertible if and only if the \(x_{i}\) are distinct.\\
+Solution. This is left to Sheet 1, Exercise 5.
+
+\footnotetext{\({ }^{1}\) After the French mathematician Alexandre-Théophile Vandermonde (1735-1796).
+}\subsection*{1.2 Permutation Matrices}
+It was claimed in Remark 11 that the determinant function for \(n \times n\) matrices is entirely determined by certain algebraic properties. In light of Lemma 14, these properties are equivalent to\\
+(i) det is linear in the rows of a matrix.\\
+(ii) if a matrix has two equal rows then its determinant is zero.\\
+(ii)' if the matrix \(B\) is produced by swapping two of the rows of \(A\) then \(\operatorname{det} B=-\operatorname{det} A\).\\
+(iii) \(\operatorname{det} I_{n}=1\).
+
+To see why these properties determine det, we first consider the \(n=2\) case. Given a \(2 \times 2\) matrix \(A=\left(a_{i j}\right)\), we can calculate its determinant as follows. As det is linear in row 1 then
+
+\[
+\left|\begin{array}{ll}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{array}\right|=\left|\begin{array}{cc}
+a_{11} & 0 \\
+a_{21} & a_{22}
+\end{array}\right|+\left|\begin{array}{cc}
+0 & a_{12} \\
+a_{21} & a_{22}
+\end{array}\right|
+\]
+
+which, as det is linear in row 2 , equals
+
+\[
+\left\{\left|\begin{array}{cc}
+a_{11} & 0 \\
+0 & a_{22}
+\end{array}\right|+\left|\begin{array}{ll}
+a_{11} & 0 \\
+a_{21} & 0
+\end{array}\right|\right\}+\left\{\left|\begin{array}{cc}
+0 & a_{12} \\
+a_{21} & 0
+\end{array}\right|+\left|\begin{array}{ll}
+0 & a_{12} \\
+0 & a_{22}
+\end{array}\right|\right\} .
+\]
+
+Again as det is linear in rows the above equals
+
+\[
+a_{11} a_{22}\left|\begin{array}{ll}
+1 & 0 \\
+0 & 1
+\end{array}\right|+a_{11} a_{21}\left|\begin{array}{ll}
+1 & 0 \\
+1 & 0
+\end{array}\right|+a_{12} a_{21}\left|\begin{array}{ll}
+0 & 1 \\
+1 & 0
+\end{array}\right|+a_{12} a_{22}\left|\begin{array}{ll}
+0 & 1 \\
+0 & 1
+\end{array}\right| .
+\]
+
+Then, using (ii), this equals
+
+\[
+a_{11} a_{22}\left|\begin{array}{cc}
+1 & 0 \\
+0 & 1
+\end{array}\right|+a_{12} a_{21}\left|\begin{array}{cc}
+0 & 1 \\
+1 & 0
+\end{array}\right|
+\]
+
+which, using (ii)', equals
+
+\[
+a_{11} a_{22}\left|\begin{array}{ll}
+1 & 0 \\
+0 & 1
+\end{array}\right|-a_{12} a_{21}\left|\begin{array}{ll}
+1 & 0 \\
+0 & 1
+\end{array}\right| .
+\]
+
+Finally, using (iii), we've shown
+
+\[
+\left|\begin{array}{ll}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{array}\right|=a_{11} a_{22}-a_{12} a_{21}
+\]
+
+If we were to argue similarly for a \(3 \times 3\) matrix \(A=\left(a_{i j}\right)\), we could first use linearity to expand the determinant into a linear combination of \(3^{3}=27\) determinants, with entries 1 and 0 , each multiplied by a monomial \(a_{1 i} a_{2 j} a_{3 k}\). But we can ignore those cases where \(i, j, k\) involves some\\
+repetition as the corresponding determinant is zero. There would, in fact, be only \(3!=6\) non-zero contributions giving us the formula
+
+\[
+\begin{aligned}
+& a_{11} a_{22} a_{23}\left|\begin{array}{lll}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{array}\right|+a_{12} a_{23} a_{31}\left|\begin{array}{lll}
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+1 & 0 & 0
+\end{array}\right|\left|\begin{array}{lll}
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+1 & 0 & 0
+\end{array}\right|+a_{13} a_{21} a_{32}\left|\begin{array}{lll}
+0 & 0 & 1 \\
+1 & 0 & 0 \\
+0 & 1 & 0
+\end{array}\right| \\
+& +a_{12} a_{21} a_{33}\left|\begin{array}{lll}
+0 & 1 & 0 \\
+1 & 0 & 0 \\
+0 & 0 & 1
+\end{array}\right|+a_{13} a_{22} a_{31}\left|\begin{array}{lll}
+0 & 0 & 1 \\
+0 & 1 & 0 \\
+1 & 0 & 0
+\end{array}\right|+a_{11} a_{23} a_{32}\left|\begin{array}{lll}
+1 & 0 & 0 \\
+0 & 0 & 1 \\
+0 & 1 & 0
+\end{array}\right| .
+\end{aligned}
+\]
+
+The first determinant here is \(\operatorname{det} I_{3}\) which we know to be 1 . The other determinants all have the same rows \((1,0,0),(0,1,0),(0,0,1)\) as \(I_{3}\) but appearing in some other order. In each case, it is possible (if necessary) to swap \((1,0,0)\) - which appears as some row of the determinant with the first row, so that it is now in the correct place. Likewise the second row can be moved (if necessary) so it is in the right place. By a process of elimination the third row is now in the right place and we have transformed the determinant into det \(I_{3}\). We know what the effect of each such swap is, namely multiplying by -1 , and so the six determinants above have values 1 or -1 . For example,
+
+\[
+\left|\begin{array}{lll}
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+1 & 0 & 0
+\end{array}\right|=-\left|\begin{array}{lll}
+1 & 0 & 0 \\
+0 & 0 & 1 \\
+0 & 1 & 0
+\end{array}\right|=\left|\begin{array}{lll}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{array}\right|=1, \quad\left|\begin{array}{lll}
+0 & 0 & 1 \\
+0 & 1 & 0 \\
+1 & 0 & 0
+\end{array}\right|=-\left|\begin{array}{lll}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{array}\right|=-1 .
+\]
+
+So finally we have, as we found in Proposition 5(b), that
+
+\[
+\left|\begin{array}{lll}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{23} & a_{33}
+\end{array}\right|=a_{11} a_{22} a_{23}+a_{12} a_{23} a_{31}+a_{13} a_{21} a_{32}-a_{12} a_{21} a_{33}-a_{13} a_{22} a_{31}-a_{11} a_{23} a_{32}
+\]
+
+The general situation is hopefully now clear for an \(n \times n\) matrix \(A=\left(a_{i j}\right)\). Using linearity to expand along each row in turn, \(\operatorname{det} A\) can be written as the sum of \(n^{n}\) terms
+
+\[
+\sum \operatorname{det} P_{i_{1} \cdots i_{n}} a_{1 i_{1}} \cdots a_{n i_{n}}
+\]
+
+where \(P_{i_{1} \cdots i_{n}}\) is the matrix whose rows are \(\mathbf{e}_{i_{1}}, \ldots, \mathbf{e}_{i_{n}}\) - that is the entries of \(P_{i_{1} \cdots i_{n}}\) are all zero except entries \(\left(1, i_{1}\right), \ldots,\left(n, i_{n}\right)\) which are all 1 . At the moment each of \(i_{1}, \ldots, i_{n}\) can independently take a value between 1 and \(n\), but most such choices lead to the determinant \(\operatorname{det} P_{i_{1} \cdots i_{n}}\) being zero as some of the rows \(\mathbf{e}_{i_{1}}, \ldots, \mathbf{e}_{i_{n}}\) are repeated. In fact, \(\operatorname{det} P_{i_{1} \cdots i_{n}}\) can only be non-zero when
+
+\[
+\left\{i_{1}, \ldots, i_{n}\right\}=\{1, \ldots, n\}
+\]
+
+That is \(i_{1}, \ldots, i_{n}\) are \(1, \ldots n\) in some order or equivalently the rows of \(P_{i_{1} \cdots i_{n}}\) are \(\mathbf{e}_{1}, \ldots, \mathbf{e}_{n}\) in some order.
+
+Definition 25 An \(n \times n\) matrix \(P\) is said to be a permutation matrix if its rows are \(\mathbf{e}_{1}, \ldots, \mathbf{e}_{n}\) in some order. This is equivalent to saying that each row and column contains a single entry 1 with all other entries being zero.
+
+Thus we have shown:\\
+Proposition 26 The function det is entirely determined by the three algebraic properties (i), (ii) and (iii). Further, the determinant \(\operatorname{det} A\) of an \(n \times n\) matrix \(A=\left(a_{i j}\right)\) equals
+
+\[
+\operatorname{det} A=\sum \operatorname{det} P_{i_{1} \cdots i_{n}} a_{1 i_{1}} \cdots a_{n i_{n}}
+\]
+
+where the sum is taken over all permutation matrices \(P_{i_{1} \cdots i_{n}}=\left(\mathbf{e}_{i_{1}} / \cdots / \mathbf{e}_{i_{n}}\right)\).\\
+We further note:\\
+Proposition 27 (a) The columns of a permutation matrix are \(\mathbf{e}_{1}^{T}, \ldots, \mathbf{e}_{n}^{T}\) in some order.\\
+(b) The number of \(n \times n\) permutation matrices is \(n\) !.\\
+(c) A permutation matrix has determinant 1 or -1 .\\
+(d) When \(n \geqslant 2\), half the permutation matrices have determinant 1 and half have determinant -1 .
+
+Proof. (a) The entries in the first column of a permutation matrix \(P\) are the first entries of \(\mathbf{e}_{1}, \mathbf{e}_{2}, \ldots, \mathbf{e}_{n}\) in some order and so are \(1,0, \ldots, 0\) in some order - that is the first column is \(\mathbf{e}_{i}^{T}\) for some \(i\). Likewise each column of \(P\) is \(\mathbf{e}_{i}^{T}\) for some \(i\). If any of the columns of \(P\) were the same then this would mean that a row of \(P\) had two non-zero entries which cannot occur. So the columns are all distinct. As there are \(n\) columns then each of \(\mathbf{e}_{1}^{T}, \ldots, \mathbf{e}_{n}^{T}\) appears exactly once.\\
+(b) This is equal to the number of bijections from the set \(\{1,2, \ldots, n\}\) to itself.\\
+(c) The rows of a permutation matrix \(P\) are \(\mathbf{e}_{1}, \ldots, \mathbf{e}_{n}\) in some order. We know that swapping two rows of a matrix has the effect of multiplying the determinant by -1 . We can create a (possibly new) matrix \(P_{1}\) by swapping the first row of \(P\) with the row \(\mathbf{e}_{1}\) (which appears somewhere); of course no swap may be needed. The matrix \(P_{1}\) has \(\mathbf{e}_{1}\) as its first row and \(\operatorname{det} P_{1}= \pm \operatorname{det} P\) depending on whether a swap was necessary or not. We can continue in this fashion producing matrices \(P_{1}, \ldots, P_{n}\) such that the first \(k\) rows of \(P_{k}\) are \(\mathbf{e}_{1}, \ldots, \mathbf{e}_{k}\) in that order and \(\operatorname{det} P_{k}= \pm \operatorname{det} P_{k-1}\) in each case, depending on whether or not we needed to make any swap to get \(\mathbf{e}_{k}\) to the \(k\) th row. Eventually then \(P_{n}=I_{n}\) and \(\operatorname{det} P= \pm \operatorname{det} P_{n}=1\) or -1 depending on whether an even or odd number of swaps had to be made to turn \(P\) into \(I_{n}\).\\
+(d) Let \(n \geqslant 2\) and let \(S_{12}\) be the elementary \(n \times n\) matrix associated with swapping the first and second rows of a matrix. If \(P\) is a permutation matrix then \(S_{12} P\) is also a permutation matrix as its rows are still \(\mathbf{e}_{1}, \ldots, \mathbf{e}_{n}\) in some order; further
+
+\[
+\operatorname{det} S_{12} P=\operatorname{det} S_{12} \times \operatorname{det} P=-\operatorname{det} P
+\]
+
+For each permutation matrix \(P\) with \(\operatorname{det} P=1\), we have \(S_{12} P\) being a permutation matrix with \(\operatorname{det}\left(S_{12} P\right)=-1\); conversely for every permutation matrix \(\tilde{P}\) with \(\operatorname{det} \tilde{P}=-1\) we have \(S_{12} \tilde{P}\) being a permutation matrix with \(\operatorname{det}\left(S_{12} \tilde{P}\right)=1\) As these processes are inverses of one another, because \(S_{12}\left(S_{12} P\right)=P\), there are equal numbers of determinant 1 and determinant -1 permutation matrices, each separately numbering \(\frac{1}{2} n!\).
+
+We now prove a result already mentioned in Remark 11. Our inductive definition of the determinant began by expanding down the first column. In fact it is the case that we will arrive at the same answer, the determinant, whichever column or row we expand along.
+
+Theorem 28 (Equality of determinant expansions \({ }^{2}\) ) Let \(A=\left(a_{i j}\right.\) ) be an \(n \times n\) matrix and let \(C_{i j}\) denote the \((i, j)\) th cofactor of \(A\). Then the determinant \(\operatorname{det} A\) may be calculated by expanding along any column or row of \(A\). So, for any \(1 \leqslant i \leqslant n\), we have
+
+\[
+\begin{aligned}
+\operatorname{det} A & =a_{1 i} C_{1 i}+a_{2 i} C_{2 i}+\cdots+a_{n i} C_{n i} \quad \text { [this is expansion along the ith column] (1.4) } \\
+& =a_{i 1} C_{i 1}+a_{i 2} C_{i 2}+\cdots+a_{i n} C_{i n} \quad \text { [this is expansion along the ith row]. }
+\end{aligned}
+\]
+
+Proof. We showed in Theorem 13 and Proposition 10 that det has properties (i), (ii), (iii), and have just shown in Proposition 26 that these properties uniquely determine the function det. Making the obvious changes to Theorem 13 and Proposition 10 it can similarly be shown, for any \(i\), that the function which assigns
+
+\[
+a_{1 i} C_{1 i}+a_{2 i} C_{2 i}+\cdots+a_{n i} C_{n i}
+\]
+
+to the matrix \(A=\left(a_{i j}\right)\) also has properties (i), (ii), (iii). By uniqueness it follows that (1.6) also equals \(\operatorname{det} A\). That is, expanding down any column also leads to the same answer of \(\operatorname{det} A\). Then
+
+\[
+\begin{aligned}
+\operatorname{det} A=\operatorname{det} A^{T} & =\left[A^{T}\right]_{1 i} C_{1 i}\left(A^{T}\right)+\left[A^{T}\right]_{2 i} C_{2 i}\left(A^{T}\right)+\cdots+\left[A^{T}\right]_{n i} C_{n i}\left(A^{T}\right) \\
+& =a_{i 1} C_{i 1}+a_{i 2} C_{i 2}+\cdots+a_{i n} C_{i n}
+\end{aligned}
+\]
+
+by expanding down the \(i\) th column of \(A^{T}\), but this is the same sum found when expanding along the \(i\) th row of \(A\).
+
+In practical terms, however, Laplace's result isn't that helpful. We have already discounted repeated expansion along rows and columns of hard-to-calculate cofactors as a hugely inefficient means to find determinants (see Remarks 11 and 21). However, it does lead us to the following theorem of interest.
+
+Theorem 29 (Existence of the Adjugate) Let \(A\) be an \(n \times n\) matrix. Let \(C_{i j}\) denote the \((i, j)\) th cofactor of \(A\) and let \(C=\left(C_{i j}\right)\) be the matrix of cofactors. Then
+
+\[
+C^{T} A=A C^{T}=\operatorname{det} A \times I_{n}
+\]
+
+In particular, if \(A\) is invertible, then
+
+\[
+A^{-1}=\frac{C^{T}}{\operatorname{det} A}
+\]
+
+Proof. Note
+
+\[
+\left[C^{T} A\right]_{i j}=\sum_{k=1}^{n}\left[C^{T}\right]_{i k}[A]_{k j}=\sum_{k=1}^{n} C_{k i} a_{k j}
+\]
+
+When \(i=j\) then
+
+\[
+\left[C^{T} A\right]_{i i}=\sum_{k=1}^{n} a_{k i} C_{k i}=\operatorname{det} A
+\]
+
+\footnotetext{\({ }^{2}\) This was proved by Pierre-Simon Laplace (1749-1827) in 1772, though Leibniz had been aware of this result a century earlier.
+}
+by Theorem 28 as this is the determinant calculated by expanding along the \(i\) th column. On the other hand, if \(i \neq j\), then consider the matrix \(B\) which has the same columns as \(A\) except for the \(i\) th column of \(B\) which is a copy of \(A\) 's \(j\) th column. As the \(i\) th and \(j\) th columns of \(B\) are equal then \(\operatorname{det} B\) is zero. Note that the ( \(k, i\) )th cofactor of \(B\) equals \(C_{k i}\) as \(A\) and \(B\) agree except in the \(i\) th column; so if expanding \(\operatorname{det} B\) along its \(i\) th column we see
+\[
+0=\operatorname{det} B=\sum_{k=1}^{n} b_{k i} C_{k i}=\sum_{k=1}^{n} a_{k j} C_{k i}=\left[C^{T} A\right]_{i j}
+\]
+
+So \(C^{T} A=\operatorname{det} A \times I_{n}\). That \(A C^{T}=\operatorname{det} A \times I_{n}\) similarly follows. Finally if \(A\) is invertible, then \(\operatorname{det} A \neq 0\), and (1.7) follows.
+
+Definition 30 With notation as in Theorem 29 the matrix \(C^{T}\) is called the adjugate of \(A\) (or sometimes the adjoint of \(A\) ) and is written \(\operatorname{adj} A\).
+
+Corollary 31 (Cramer's Rule \({ }^{3}\) ) Let \(A\) be an \(n \times n\) matrix, \(\mathbf{b}\) in \(\mathbb{R}_{\text {col }}^{n}\) and consider the linear system \((A \mid \mathbf{b})\). The system has a unique solution if and only if \(\operatorname{det} A \neq 0\), which is given by
+
+\[
+\mathbf{x}=\frac{C^{T} \mathbf{b}}{\operatorname{det} A}
+\]
+
+Proof. There is a solution if and only if \(L_{A}\) is onto which is then unique if and only if the kernel is trivial. That is \(A\) is invertible and the result follows from the previous theorem and Corollary 18.
+
+Remark 32 Writing \(A=\left(a_{i j}\right)\) and \(\mathbf{b}=\left(b_{1}, \ldots, b_{n}\right)^{T}\) then Cramer's Rule with \(n=2\) expressly reads as
+
+\[
+x_{1}=\frac{b_{1} a_{22}-b_{2} a_{12}}{\operatorname{det} A}, \quad x_{2}=\frac{b_{2} a_{11}-b_{1} a_{21}}{\operatorname{det} A}
+\]
+
+where \(\operatorname{det} A=a_{11} a_{22}-a_{12} a_{21}\). When \(n=3\) Cramer's rule reads as
+
+\[
+\begin{aligned}
+x_{1}= & \frac{b_{1}\left|\begin{array}{cc}
+a_{22} & a_{23} \\
+a_{32} & a_{33}
+\end{array}\right|-b_{2}\left|\begin{array}{cc}
+a_{12} & a_{13} \\
+a_{32} & a_{33}
+\end{array}\right|+b_{3}\left|\begin{array}{cc}
+a_{12} & a_{13} \\
+a_{22} & a_{23}
+\end{array}\right|}{\operatorname{det} A}, \\
+x_{2}= & \frac{-b_{1}\left|\begin{array}{cc}
+a_{21} & a_{23} \\
+a_{31} & a_{33}
+\end{array}\right|+b_{2}\left|\begin{array}{cc}
+a_{11} & a_{13} \\
+a_{31} & a_{33}
+\end{array}\right|-b_{3}\left|\begin{array}{cc}
+a_{11} & a_{13} \\
+a_{21} & a_{23}
+\end{array}\right|}{\operatorname{det} A}, \\
+x_{3}= & \frac{b_{1}\left|\begin{array}{ll}
+a_{21} & a_{22} \\
+a_{31} & a_{32}
+\end{array}\right|-b_{2}\left|\begin{array}{cc}
+a_{11} & a_{12} \\
+a_{31} & a_{32}
+\end{array}\right|+b_{3}\left|\begin{array}{cc}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{array}\right|}{\operatorname{det} A},
+\end{aligned}
+\]
+
+where \(\operatorname{det} A=a_{11} a_{22} a_{33}+a_{12} a_{23} a_{31}+a_{13} a_{21} a_{32}-a_{12} a_{21} a_{33}-a_{13} a_{22} a_{31}-a_{11} a_{23} a_{32}\).\\
+Cramer's rule though is a seriously limited and impractical means of solving linear systems. The rule only applies when the matrix \(A\) is square and invertible, and the computational power required to calculate so many cofactors and \(\operatorname{det} A\) make it substantially more onerous than row-reduction.
+
+\footnotetext{\({ }^{3}\) Named after the Swiss mathematician, Gabriel Cramer (1704-1752), who discovered this result in 1750.
+}\subsection*{1.3 Determinants of Linear Maps}
+Definition 33 Let \(T: V \rightarrow V\) be a linear map of a finite dimensional vector space \(V\). Then the determinant of \(T\) is defined by
+
+\[
+\operatorname{det} T=\operatorname{det} A
+\]
+
+where \(A\) is a matrix representing \(T\) with respect to some basis for \(V\).\\
+Proposition 34 (a) The determinant of a linear map is well-defined.\\
+(b) If \(S: V \rightarrow V\) is a second linear map then
+
+\[
+\operatorname{det}(S T)=\operatorname{det} S \times \operatorname{det} T
+\]
+
+(c) \(T: V \rightarrow V\) is invertible if and only if \(\operatorname{det} T \neq 0\). If \(T\) is invertible then
+
+\[
+\operatorname{det}\left(T^{-1}\right)=\frac{1}{\operatorname{det} T}
+\]
+
+Proof. (a) As \(T\) may have many different matrix representatives, it is possible that different representatives might have different determinants. However any two representatives, \(A\) and \(B\), of \(T\) are similar matrices so that \(A=P^{-1} B P\) for some invertible matrix \(P\). Specifically if
+
+\[
+A={ }_{\mathcal{E}} T_{\mathcal{E}} \quad \text { and } \quad B={ }_{\mathcal{F}} T_{\mathcal{F}}
+\]
+
+then \(A=P^{-1} B P\) where \(P={ }_{\mathcal{F}} I_{\mathcal{E}}\). By the product rule for determinants we have
+
+\[
+\operatorname{det} A=\operatorname{det}\left(P^{-1} B P\right)=\frac{1}{\operatorname{det} P} \times \operatorname{det} B \times \operatorname{det} P=\operatorname{det} B
+\]
+
+and hence each matrix representative of \(T\) has the same determinant.\\
+(b) Say that \(S\) and \(T\) are represented by \(A\) and \(B\) wrt the same basis for \(V\). Then \(S T\) is represented by \(A B\) wrt the same basis. So, by the product rule,
+
+\[
+\operatorname{det}(S T)=\operatorname{det}(A B)=\operatorname{det} A \times \operatorname{det} B=\operatorname{det} S \times \operatorname{det} T .
+\]
+
+(c) Say that \(T\) is invertible. Then there is a linear map \(S: V \rightarrow V\) such that \(S T=I=T S\). So
+
+\[
+1=\operatorname{det} I=\operatorname{det} S \times \operatorname{det} T
+\]
+
+showing \(\operatorname{det} T \neq 0\). Conversely say that \(\operatorname{det} T \neq 0\). Let \(A\) be a matrix representing \(T\) wrt some basis. So \(\operatorname{det} A \neq 0\) and \(A\) is an invertible matrix. Let \(S: V \rightarrow V\) be the linear map represented by \(A^{-1}\) wrt the same basis. Then \(S T\) is represented by \(A^{-1} A=I\) wrt this basis, and \(T S\) is represented by \(A A^{-1}=I\) wrt this basis. But the identity matrix represents the identity map wrt all bases and so
+
+\[
+S T=I=T S
+\]
+
+Thus \(S=T^{-1}\) and \(T\) is invertible. Finally, when \(T\) is invertible, we have
+
+\[
+\left(\operatorname{det} T^{-1}\right)(\operatorname{det} T)=\operatorname{det}\left(T^{-1} T\right)=\operatorname{det} I=1,
+\]
+
+and the result follows.
+
+Example 35 Let \(V=\left\langle 1, x, x^{2}\right\rangle\) be the space of real polynomials in \(x\) of degree at most 2 . Define \(D, T: V \rightarrow V\) by
+
+\[
+(D f)(x)=f^{\prime}(x), \quad(T f)(x)=f(x+1)
+\]
+
+Evaluate \(\operatorname{det} D\) and \(\operatorname{det} T\).\\
+Solution. As \(D(1)=0\) then \(D\) is not invertible and so \(\operatorname{det} D=0\). Alternatively the matrix for \(D\) wrt \(\left\{1, x, x^{2}\right\}\) is
+
+\[
+D=\left(\begin{array}{lll}
+0 & 1 & 0 \\
+0 & 0 & 2 \\
+0 & 0 & 0
+\end{array}\right),
+\]
+
+and \(\operatorname{det} D=0^{3}=0\) as this is an upper triangular matrix.\\
+Now the matrix for \(T\) wrt the same basis is
+
+\[
+T=\left(\begin{array}{lll}
+1 & 1 & 1 \\
+0 & 1 & 2 \\
+0 & 0 & 1
+\end{array}\right)
+\]
+
+and so \(\operatorname{det} T=1^{3}=1\).
+
+\section*{2. EIGENVALUES, EIGENVECTORS AND DIAGONALIZABILITY}
+Definition 36 An \(n \times n\) matrix \(A\) is said to be diagonalizable if there is an invertible matrix \(P\) such that \(P^{-1} A P\) is diagonal.
+
+Two questions immediately spring to mind: why might this be a useful definition, and how might we decide whether such a matrix \(P\) exists? In an attempt to partially answer the first question, we note
+
+\[
+\left(P^{-1} A P\right)^{k}=\left(P^{-1} A P\right)\left(P^{-1} A P\right) \times \cdots \times\left(P^{-1} A P\right)=P^{-1} A^{k} P
+\]
+
+as all the internal products \(P P^{-1}\) cancel. Thus if \(P^{-1} A P=D\) is diagonal then
+
+\[
+A^{k}=P D^{k} P^{-1} \quad \text { for a natural number } k
+\]
+
+and so we are in a position to easily calculate the powers of \(A\). So ease of calculation is clearly one advantage of a matrix being diagonalizable.
+
+For now we will consider this reason enough to seek to answer the second question: how do we determine whether such a \(P\) exists? Suppose such a \(P\) exists and has columns \(\mathbf{v}_{1}, \mathbf{v}_{2}, \ldots, \mathbf{v}_{n}\). As \(P\) is invertible then the \(\mathbf{v}_{i}\) are independent. Further as \(A P=P D\) where \(D=\operatorname{diag}\left(\lambda_{1}, \ldots, \lambda_{n}\right)\) then we have that
+
+\[
+i \text { th column of } A P=A \mathbf{v}_{i} \quad \text { and } \quad i \text { th column of } P D=P\left(\lambda_{i} \mathbf{e}_{i}^{T}\right)=\lambda_{i} \mathbf{v}_{i} .
+\]
+
+So the columns of \(P\) are \(n\) independent vectors, each of which \(A\) maps to a scalar multiple of itself. Thus we make the following definitions.
+
+Definition 37 Let \(A\) be an \(n \times n\) matrix. We say that a vector \(\mathbf{v} \neq \mathbf{0}\) in \(\mathbb{R}_{\text {col }}^{n}\) is an eigenvector \({ }^{1}\) of \(A\) if \(A \mathbf{v}=\lambda \mathbf{v}\) for some scalar \(\lambda\). The scalar \(\lambda\) is called the eigenvalue of \(\mathbf{v}\) and we will also refer to \(\mathbf{v}\) as a \(\lambda\)-eigenvector.
+
+Definition \(38 n\) linearly independent eigenvectors of an \(n \times n\) matrix \(A\) are called an eigenbasis.
+
+Remark 39 Let \(T: V \rightarrow V\) be a linear map of a finite-dimensional vector space. The terms eigenvalue, eigenvector and eigenbasis are well-defined for \(T\). If \(\mathbf{v}\) is a \(\lambda\)-eigenvector of a matrix \(A\), then \(P^{-1} \mathbf{v}\) is a \(\lambda\)-eigenvector of \(B=P^{-1} A P\). So if \(A\) and \(B\) are matrix representatives of \(T\), then the eigenvalues of \(A\) and \(B\) are the same; the eigenvectors of \(A\) and \(B\) will be different co-ordinate vectors, but represent the same vectors in \(V\).
+
+\footnotetext{\({ }^{1}\) The German adjective eigen means 'own' or 'particular'. David Hilbert was the first to use the term in the early 20th century. The term proper or characteristic is sometimes also used, especially in older texts.
+}And we have partly demonstrated the following.\\
+Theorem \(40 A n n \times n\) matrix \(A\) is diagonalizable if and only if \(A\) has an eigenbasis.\\
+Proof. We showed above that if such a \(P\) exists then its columns form an eigenbasis. Conversely if \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{n}\) form an eigenbasis, with respective eigenvalues \(\lambda_{1}, \ldots, \lambda_{n}\), we define
+
+\[
+P=\left(\mathbf{v}_{1}|\cdots| \mathbf{v}_{n}\right)
+\]
+
+to be the \(n \times n\) matrix with columns \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{n}\). Again \(P\) is invertible as its columns are linearly independent. Then
+
+\[
+P \mathbf{e}_{i}^{T}=\mathbf{v}_{i} \quad \text { and } \quad A P \mathbf{e}_{i}^{T}=A \mathbf{v}_{i}=\lambda_{i} \mathbf{v}_{i}=\lambda_{i} P \mathbf{e}_{i}^{T}=P\left(\lambda_{i} \mathbf{e}_{i}^{T}\right)
+\]
+
+so that \(P^{-1} A P \mathbf{e}_{i}^{T}=\lambda_{i} \mathbf{e}_{i}^{T}\) for each \(i\) or equivalently
+
+\[
+P^{-1} A P=\operatorname{diag}\left(\lambda_{1}, \lambda_{2}, \ldots, \lambda_{n}\right)
+\]
+
+Note that \(\lambda\) is an eigenvalue of \(A\) if and only if the equation \(A \mathbf{v}=\lambda \mathbf{v}\) has a non-zero solution or equivalently if \(\left(\lambda I_{n}-A\right) \mathbf{v}=\mathbf{0}\) has a non-zero solution. This is equivalent to \(\lambda I_{n}-A\) being singular, which in turn is equivalent to \(\operatorname{det}\left(\lambda I_{n}-A\right)=0\). Thus we have shown (a) below.
+
+Proposition 41 Let \(A\) be an \(n \times n\) matrix and \(\lambda \in \mathbb{R}\).\\
+(a) \(\lambda\) is an eigenvalue of \(A\) if and only if \(x=\lambda\) is a root of \(\operatorname{det}\left(x I_{n}-A\right)=0\).\\
+(b) \(\operatorname{det}\left(x I_{n}-A\right)\) is a polynomial in \(x\) of degree \(n\) which is monic (i.e. leading coefficient is 1 ).\\
+(c) If \(\operatorname{det}\left(x I_{n}-A\right)=x^{n}+c_{n-1} x^{n-1}+\cdots+c_{0}\) then
+
+\[
+c_{0}=(-1)^{n} \operatorname{det} A \quad \text { and } \quad c_{n-1}=-\operatorname{trace}(A)
+\]
+
+Proof. (b) Note
+
+\[
+\operatorname{det}\left(x I_{n}-A\right)=\left|\begin{array}{cccc}
+x-a_{11} & -a_{12} & \cdots & -a_{1 n} \\
+-a_{21} & x-a_{22} & \cdots & -a_{2 n} \\
+\vdots & \vdots & \ddots & \vdots \\
+-a_{n 1} & -a_{n 2} & \cdots & x-a_{n n}
+\end{array}\right|
+\]
+
+This determinant is the sum of \(n!\) products that take one entry from each row and each column. The largest power of \(x\) is produced from the product of the diagonal entries
+
+\[
+\left(x-a_{11}\right)\left(x-a_{22}\right) \cdots\left(x-a_{n n}\right) .
+\]
+
+The greatest power of \(x\) here is \(x^{n}\) and the coefficient of \(x^{n}\) is 1 . All other products give polynomials in \(x\) of degree strictly less than \(n\).\\
+(c) By setting \(x=0\) we see that
+
+\[
+c_{0}=\operatorname{det}(-A)=(-1)^{n} \operatorname{det} A
+\]
+
+Contributions to the \(x^{n-1}\) term only come from the product of the diagonal entries (2.1). If one diagonal entry is omitted from a product then necessarily a second diagonal entry is also omitted and thus the greatest power of \(x\) from such a product can be \(x^{n-2}\). The coefficient of \(x^{n-1}\) from (2.1) is
+
+\[
+-a_{11}-a_{22}-\cdots-a_{n n}=-\operatorname{trace}(A)
+\]
+
+Definition 42 Let \(A\) be a real \(n \times n\) matrix. Then the characteristic polynomial of \(A\) is
+
+\[
+\chi_{A}(x)=\operatorname{det}\left(x I_{n}-A\right)
+\]
+
+Example 43 Find the eigenvalues of the following matrices.
+
+\[
+A=\left(\begin{array}{cc}
+1 & 1 \\
+1 & 1
+\end{array}\right) ; \quad B=\left(\begin{array}{cc}
+1 & -1 \\
+1 & 1
+\end{array}\right) ; \quad C=\left(\begin{array}{ccc}
+3 & 2 & -4 \\
+0 & 1 & 4 \\
+0 & 0 & 3
+\end{array}\right) ; \quad D=\left(\begin{array}{ccc}
+5 & -3 & -5 \\
+2 & 9 & 4 \\
+-1 & 0 & 7
+\end{array}\right)
+\]
+
+Solution. By Proposition 41(a) this is equivalent to finding the real roots of the matrices' characteristic polynomials.\\
+(a) The eigenvalues of \(A\) are 0 and 2 as
+
+\[
+\chi_{A}(x)=\left|\begin{array}{cc}
+x-1 & -1 \\
+-1 & x-1
+\end{array}\right|=(x-1)^{2}-1=x(x-2)
+\]
+
+(b) Similarly note
+
+\[
+\chi_{B}(x)=\left|\begin{array}{cc}
+x-1 & 1 \\
+-1 & x-1
+\end{array}\right|=(x-1)^{2}+1=x^{2}-2 x+2 .
+\]
+
+Now \(\chi_{B}(x)\) has no real roots (the roots are \(1 \pm i\) ) and so \(B\) has no eigenvalues.\\
+(c) As \(C\) is triangular then we can immediately see that \(\chi_{C}(x)=(x-3)(x-1)(x-3)\). So \(C\) has eigenvalues \(1,3,3\), the eigenvalue of 3 being a repeated root of \(\chi_{C}(x)\).\\
+(d) Finally \(D\) has eigenvalues \(6,6,9\), the eigenvalue of 6 being repeated as \(\chi_{D}(x)\) equals
+
+\[
+\begin{aligned}
+& \left|\begin{array}{ccc}
+x-5 & 3 & 5 \\
+-2 & x-9 & -4 \\
+1 & 0 & x-7
+\end{array}\right|=\left|\begin{array}{ccc}
+x-6 & x-6 & x-6 \\
+-2 & x-9 & -4 \\
+1 & 0 & x-7
+\end{array}\right|=(x-6)\left|\begin{array}{ccc}
+1 & 1 & 1 \\
+-2 & x-9 & -4 \\
+1 & 0 & x-7
+\end{array}\right| \\
+= & (x-6)\left|\begin{array}{ccc}
+1 & 0 & 0 \\
+-2 & x-7 & -2 \\
+1 & -1 & x-8
+\end{array}\right|=(x-6)\left|\begin{array}{cc}
+x-7 & -2 \\
+-1 & x-8
+\end{array}\right|=(x-6)^{2}(x-9) .
+\end{aligned}
+\]
+
+Here follow some basic facts about eigenvalues, eigenvectors and diagonalizability.\\
+Proposition 44 Let \(A\) be an \(n \times n\) matrix and \(\lambda \in \mathbb{R}\).\\
+(a) The \(\lambda\)-eigenvectors of \(A\), together with \(\mathbf{0}\), form a subspace of \(\mathbb{R}_{\mathrm{col}}^{n}\). This is called the \(\lambda\) eigenspace, usually denoted \(E_{\lambda}\).\\
+(b) For \(1 \leqslant i \leqslant k\), let \(\mathbf{v}_{i}\) be a \(\lambda_{i}\)-eigenvector of \(A\). If \(\lambda_{1}, \ldots, \lambda_{k}\) are distinct then \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{k}\) are independent.\\
+(c) The distinct eigenspaces of \(A\) form a direct sum in \(\mathbb{R}_{\mathrm{col}}^{n}\). This direct sum equals \(\mathbb{R}_{\mathrm{col}}^{n}\) if and only if \(A\) is diagonalizable.
+
+Proof. (a) This is \(\operatorname{ker}\left(A-\lambda I_{n}\right)\) and kernels are subspaces.\\
+(b) may be proven by induction as follows. Note that \(\mathbf{v}_{1} \neq \mathbf{0}\) (as it is an eigenvector) and so \(\mathbf{v}_{1}\) makes an independent set. Suppose, as our inductive hypothesis, that \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{i}\) are linearly independent vectors and that
+
+\[
+\alpha_{1} \mathbf{v}_{1}+\cdots+\alpha_{i} \mathbf{v}_{i}+\alpha_{i+1} \mathbf{v}_{i+1}=\mathbf{0}
+\]
+
+for some reals \(\alpha_{1}, \ldots, \alpha_{i+1}\). If we apply \(A\) to both sides of (2.2), we find
+
+\[
+\alpha_{1} \lambda_{1} \mathbf{v}_{1}+\cdots+\alpha_{i} \lambda_{i} \mathbf{v}_{i}+\alpha_{i+1} \lambda_{i+1} \mathbf{v}_{i+1}=\mathbf{0}
+\]
+
+Now subtracting \(\lambda_{i+1}\) times (2.2) from (2.3) we arrive at
+
+\[
+\alpha_{1}\left(\lambda_{1}-\lambda_{i+1}\right) \mathbf{v}_{1}+\cdots+\alpha_{i}\left(\lambda_{i}-\lambda_{i+1}\right) \mathbf{v}_{i}=\mathbf{0} .
+\]
+
+By hypothesis \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{i}\) are linearly independent vectors and hence \(\alpha_{j}\left(\lambda_{j}-\lambda_{i+1}\right)=0\) for \(1 \leqslant j \leqslant i\). As \(\lambda_{1}, \ldots, \lambda_{i}\) are distinct then \(\alpha_{j}=0\) for \(1 \leqslant j \leqslant i\) and then by \((2.2) \alpha_{i+1}=0\). We have shown that \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{i+1}\) are linearly independent vectors and so (b) follows by induction.\\
+(c) The first part is a consequence of the argument in (b). \(A\) is diagonalizable if and only if this direct sum contains an eigenbasis.
+
+Corollary 45 If an \(n \times n\) matrix has \(n\) distinct eigenvalues then it is diagonalizable.\\
+Proof. Let \(\lambda_{1}, \ldots, \lambda_{n}\) denote the distinct eigenvalues. For each \(i\) there is a \(\lambda_{i}\)-eigenvector \(\mathbf{v}_{i}\) and by Proposition 44(b) \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{n}\) are independent. There being \(n\) of them they form an eigenbasis.
+
+\begin{itemize}
+  \item It is important to note this is a sufficient, but not a necessary condition for diagonalizability. For example, \(I_{n}\) is diagonal (and so diagonalizable) but has eigenvalue 1 repeated \(n\) times.
+\end{itemize}
+
+Example 46 Determine the eigenvectors and diagonalizability of the matrices \(A, B, C, D\) from Example 43. Comment on the direct sum of the eigenspaces.
+
+Solution. (a) We determined that \(A\) has eigenvalues \(\lambda=0\) and 2 . Note that
+
+\[
+\begin{array}{ll}
+\lambda=0: & \operatorname{ker}\left(\begin{array}{ll}
+1 & 1 \\
+1 & 1
+\end{array}\right)=\left\langle\binom{ 1}{-1}\right\rangle ; \\
+\lambda=2: & \operatorname{ker}\left(\begin{array}{cc}
+-1 & 1 \\
+1 & -1
+\end{array}\right)=\left\langle\binom{ 1}{1}\right\rangle .
+\end{array}
+\]
+
+\((1,-1)^{T}\) and \((1,1)^{T}\) form an eigenbasis and if we set
+
+\[
+P=\left(\begin{array}{cc}
+1 & 1 \\
+-1 & 1
+\end{array}\right) \quad \text { then } \quad P^{-1} A P=\left(\begin{array}{ll}
+0 & 0 \\
+0 & 2
+\end{array}\right) .
+\]
+
+Note that we could have created an invertible matrix \(P\) by swapping its columns and we would have found \(P^{-1} A P=\operatorname{diag}(2,0)\). The eigenvalues appear in the diagonal of \(P^{-1} A P\) in the order the corresponding eigenvectors appear in the columns of \(P\).
+
+Note that \(E_{0} \oplus E_{2}=\mathbb{R}_{\text {col }}^{2}\).\\
+(b) \(B\) has no real eigenvalues and so no eigenvectors. Consequently \(B\) is not diagonalizable. (At least not using a real matrix \(P\); however see Example 47.) The direct sum of the eigenspaces is \(\{\mathbf{0}\}\).\\
+(c) \(C\) has eigenvalues \(1,3,3\). Note
+
+\[
+\begin{aligned}
+\lambda=3: & \operatorname{ker}\left(\begin{array}{ccc}
+0 & 2 & -4 \\
+0 & -2 & 4 \\
+0 & 0 & 0
+\end{array}\right)=\left\langle\left(\begin{array}{l}
+1 \\
+0 \\
+0
+\end{array}\right),\left(\begin{array}{l}
+0 \\
+2 \\
+1
+\end{array}\right)\right\rangle . \\
+\lambda=1: & \operatorname{ker}\left(\begin{array}{ccc}
+2 & 2 & -4 \\
+0 & 0 & 4 \\
+0 & 0 & 2
+\end{array}\right)=\left\langle\left(\begin{array}{c}
+1 \\
+-1 \\
+0
+\end{array}\right)\right\rangle .
+\end{aligned}
+\]
+
+An eigenbasis is \((1,0,0)^{T},(0,2,1)^{T}\) and \((1,-1,0)^{T}\). Setting
+
+\[
+P=\left(\begin{array}{ccc}
+1 & 0 & 1 \\
+0 & 2 & -1 \\
+0 & 1 & 0
+\end{array}\right) \quad \text { then } \quad P^{-1} C P=\operatorname{diag}(3,3,1) .
+\]
+
+Note that \(E_{3} \oplus E_{1}=\mathbb{R}_{\text {col }}^{3}\).\\
+(d) \(D\) has eigenvalues 6,6,9. Note that
+
+\[
+\begin{array}{rlrl}
+\lambda=6: & & \operatorname{ker}\left(\begin{array}{ccc}
+-1 & -3 & -5 \\
+2 & 3 & 4 \\
+-1 & 0 & 1
+\end{array}\right) & =\left\langle\left(\begin{array}{c}
+1 \\
+-2 \\
+1
+\end{array}\right)\right\rangle . \\
+\lambda=9: & & \operatorname{ker}\left(\begin{array}{ccc}
+-4 & -3 & -5 \\
+2 & 0 & 4 \\
+-1 & 0 & -2
+\end{array}\right)=\left\langle\left(\begin{array}{c}
+-2 \\
+1 \\
+1
+\end{array}\right)\right\rangle
+\end{array}
+\]
+
+The 6 -eigenvectors are non-zero multiples of \((1,-2,1)^{T}\) and the 9 -eigenvectors are non-zero multiples of \((-2,1,1)^{T}\). As we can find no more than two independent eigenvectors, then there is no eigenbasis and \(D\) is not diagonalizable. In fact, we will shortly see that as soon as we noted the multiplicity two eigenvalue 6 yielded only one independent eigenvector then we could have known \(D\) is not diagonalizable.
+
+Example 47 Find a complex matrix \(P\) such that \(P^{-1} B P\) is diagonal, where \(B\) is as given in Example 43.\\
+Remark 48 When we defined 'diagonalizability' in Definition 36 we were, strictly speaking, defining 'diagonalizability over \(\mathbb{R}\) '. We would say that \(B\) is not diagonalizable over \(\mathbb{R}\) as no such matrix \(P\) with real entries exists, but \(B\) is diagonalizable over \(\mathbb{C}\) as such a complex matrix \(P\) does exist.
+
+Solution. The roots of \(\chi_{B}(x)=(x-1)^{2}+1\) are \(1 \pm i\). When the field of scalars is \(\mathbb{C}\), then these are distinct complex eigenvalues and we know that \(B\) is diagonalizable over \(\mathbb{C}\). Note that
+
+\[
+\begin{aligned}
+\lambda=1+i: & \operatorname{ker}\left(\begin{array}{cc}
+-i & -1 \\
+1 & -i
+\end{array}\right)=\left\langle\binom{ i}{1}\right\rangle ; \\
+\lambda=1-i: & \operatorname{ker}\left(\begin{array}{cc}
+i & -1 \\
+1 & i
+\end{array}\right)=\left\langle\binom{ 1}{i}\right\rangle .
+\end{aligned}
+\]
+
+So we may take
+
+\[
+P=\left(\begin{array}{cc}
+i & 1 \\
+1 & i
+\end{array}\right) \quad \text { and find } \quad P^{-1} B P=\left(\begin{array}{cc}
+1+i & 0 \\
+0 & 1-i
+\end{array}\right) .
+\]
+
+Note that \(E_{1+i} \oplus E_{1-i}=\mathbb{C}_{\text {col }}^{2}\).\\
+Examples 43 and 46 cover the various eventualities that may arise when investigating the diagonalizability of matrices. In summary, the checklist when testing a matrix for diagonalizability is as follows.
+
+\section*{Algorithm 49 (Determining Diagonalizability over \(\mathbb{R}\) and \(\mathbb{C}\) )}
+(a) Let \(A\) be an \(n \times n\) matrix. Determine its characteristic polynomial \(\chi_{A}\).\\
+(b) If any of the roots of \(\chi_{A}\) are not real, then \(A\) is not diagonalizable over \(\mathbb{R}\).\\
+(c) If all the roots of \(\chi_{A}\) are real and distinct then \(A\) is diagonalizable over \(\mathbb{R}\).\\
+(d) If all the roots of \(\chi_{A}\) are real, and for each root \(\lambda\) there are as many independent \(\lambda\) eigenvectors as repeated factors of \(x-\lambda\) in \(\chi_{A}(x)\), then \(A\) is diagonalizable over \(\mathbb{R}\).\\
+(c)' If the roots of \(\chi_{A}\) are distinct complex numbers then \(A\) is diagonalizable over \(\mathbb{C}\).\\
+(d)' If for each root \(\lambda\) of \(\chi_{A}\) and there are as many independent \(\lambda\)-eigenvectors in \(\mathbb{C}_{\text {col }}^{n}\) as repeated factors of \(x-\lambda\) in \(\chi_{A}(x)\), then \(A\) is diagonalizable over \(\mathbb{C}\).\\
+(c), and the same result (c') for complex matrices, were proven in Corollary 45.\\
+(d), and it complex version (d'), will be proven in Corollary 52.
+
+So a square matrix can fail to be diagonalizable using a real invertible matrix \(P\) when
+
+\begin{itemize}
+  \item not all the roots of \(\chi_{A}(x)\) are real - counting multiplicities and including complex roots, \(\chi_{A}(x)\) has \(n\) roots. However we will see (Proposition 51) that there are at most as many independent \(\lambda\)-eigenvectors as repetitions of \(\lambda\) as a root. So if some roots are not real we cannot hope to find \(n\) independent real eigenvectors. This particular problem can be circumvented by seeking an invertible complex matrix \(P\) instead.
+  \item some (real or complex) root \(\lambda\) of \(\chi_{A}(x)\) has fewer independent \(\lambda\)-eigenvectors (in \(\mathbb{R}_{\text {col }}^{n}\) or \(\mathbb{C}_{\text {col }}^{n}\) ) than there are factors of \(x-\lambda\) in \(\chi_{A}(x)\).
+\end{itemize}
+
+The latter problem cannot be circumvented, however this latter possibility is reassuringly unlikely. If a matrix's entries contain experimental data or randomly selected entries - rather than being a contrived exercise - then \(\chi_{A}(x)\) will almost certainly have distinct complex roots and so \(A\) will be diagonalizable using a complex invertible matrix \(P\).
+
+Definition 50 Let \(A\) be an \(n \times n\) matrix with eigenvalue \(\lambda\).\\
+(a) The algebraic multiplicity of \(\lambda\) is the number of factors of \(x-\lambda\) in the characteristic polynomial \(\chi_{A}(x)\).\\
+(b) The geometric multiplicity of \(\lambda\) is the maximum number of linearly independent \(\lambda\) eigenvectors. This equals the dimension of the \(\lambda\)-eigenspace.
+
+Proposition 51 The geometric multiplicity of an eigenvalue is less than or equal to its algebraic multiplicity.
+
+Proof. Let \(g\) and \(a\) respectively denote the geometric and algebraic multiplicities of an eigenvalue \(\lambda\) of an \(n \times n\) matrix \(A\). There are then \(g\) independent \(\lambda\)-eigenvectors \(\mathbf{v}_{1}, \mathbf{v}_{2}, \ldots, \mathbf{v}_{g}\) which we can extend these vectors to \(n\) independent vectors \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{n}\). If we put \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{n}\) as the columns of a matrix \(P\) then, arguing as in Theorem 40, we have
+
+\[
+P^{-1} A P=\left(\begin{array}{cc}
+\lambda I_{g} & B \\
+0 & C
+\end{array}\right)
+\]
+
+where \(B\) is a \(g \times(n-g)\) matrix and \(C\) is \((n-g) \times(n-g)\). By the product rule for determinants we have
+
+\[
+\begin{aligned}
+\chi_{A}(x) & =\operatorname{det}\left(x I_{n}-A\right) \\
+& =\operatorname{det}\left(P\left(x I_{n}-P^{-1} A P\right) P^{-1}\right) \\
+& =\operatorname{det}\left(x I_{n}-P^{-1} A P\right) \\
+& =\operatorname{det}\left(\begin{array}{cc}
+(x-\lambda) I_{g} & -B \\
+0 & x I_{n-g}-C
+\end{array}\right) \\
+& =(x-\lambda)^{g} \chi_{C}(x)
+\end{aligned}
+\]
+
+So there are at least \(g\) factors of \(x-\lambda\) in \(\chi_{A}(x)\) and hence \(a \geqslant g\).\\
+Corollary 52 Let \(A\) be a square matrix with all the roots of \(\chi_{A}\) being real. Then \(A\) is diagonalizable if and only if, for each eigenvalue, its geometric multiplicity equals its algebraic multiplicity.
+
+Proof. Let the distinct eigenvalues of \(A\) be \(\lambda_{1}, \ldots, \lambda_{k}\) with geometric multiplicities \(g_{1}, \ldots, g_{k}\) and algebraic multiplicities \(a_{1}, \ldots, a_{k}\). By the previous proposition
+
+\[
+g_{1}+\cdots+g_{k} \leqslant a_{1}+\cdots+a_{k}=\operatorname{deg} \chi_{A}=n
+\]
+
+the equalities following as all the roots of \(\chi_{A}\) are real. We can find \(g_{i}\) linearly independent \(\lambda_{i}\)-eigenvectors \(\mathbf{v}_{1}^{(i)}, \ldots, \mathbf{v}_{g_{i}}^{(i)}\) for each \(i\). If \(g_{i}=a_{i}\) for each \(i\) then we have \(n\) eigenvectors in all, but if \(g_{i}<a_{i}\) for any \(i\) then \(g_{1}+\cdots+g_{k}<n\) by (2.4), so we will not be able to find \(n\) independent eigenvectors and no eigenbasis exists. It remains to show that if \(g_{i}=a_{i}\) for each \(i\) then these \(n\) eigenvectors are indeed independent. Say that
+
+\[
+\sum_{i=1}^{k} \sum_{j=1}^{g_{i}} \alpha_{j}^{(i)} \mathbf{v}_{j}^{(i)}=\mathbf{0}
+\]
+
+for some scalars \(\alpha_{j}^{(i)}\). We can rewrite this as
+
+\[
+\sum_{i=1}^{k} \mathbf{w}_{i}=\mathbf{0}, \quad \text { where } \mathbf{w}_{i}=\sum_{j=1}^{g_{i}} \alpha_{j}^{(i)} \mathbf{v}_{j}^{(i)}
+\]
+
+As the distinct eigenspaces form a direct sum it follows that \(\mathbf{w}_{i}=\mathbf{0}\) for each \(i\); then, as the vectors \(\mathbf{v}_{1}^{(i)}, \ldots, \mathbf{v}_{g_{i}}^{(i)}\) are independent, each \(\alpha_{j}^{(i)}=0\) for each \(i\) and \(j\). Hence these \(n\) vectors are indeed independent and so form an eigenbasis.
+
+If we recall the matrices \(A, B, C, D\) from Example 43, we can now see that \(A\) meets criterion (c) and so is diagonalizable; \(B\) meets criterion (b) and so is not diagonalizable over \(\mathbb{R}\) but does meet criterion (c)' and is diagonalizable over \(\mathbb{C}\); matrix \(C\) meets criterion (d) and so is diagonalizable over \(\mathbb{R}\); matrix \(D\) fails criteria (c) and (d) and so is not diagonalizable over \(\mathbb{R}\), specifically because the eigenvalue \(\lambda=6\) has a greater algebraic multiplicity of 2 than its geometric multiplicity of 1 . This problem remains true when using complex numbers and so \(D\) is also not diagonalizable over \(\mathbb{C}\) as \(D\) fails ( \(\mathrm{c}^{\prime}\) ) and ( \(\mathrm{d}^{\prime}\) ).
+
+Remark 53 (Diagonalizability over a general field) We can decide on the diagonalizability of a matrix over a general field by following the same procedures as above. Firstly all the roots of the characteristic polynomial need to be in the field, and then for each eigenvalue the algebraic multiplicity needs to equal the geometric multiplicity. For example the matrix
+
+\[
+B=\left(\begin{array}{cc}
+1 & -1 \\
+1 & 1
+\end{array}\right)
+\]
+
+has characteristic polynomial \((x-1)^{2}+1=x^{2}-2 x+2\).
+
+\begin{itemize}
+  \item Over \(\mathbb{C}\) this is diagonalizable as \(B\) has distinct roots \(1 \pm i\).
+  \item The same would be true over the field \(\mathbb{Q}[i]=\left\{q_{1}+q_{2} i \mid q_{1}, q_{2} \in \mathbb{Q}\right\}\).
+  \item Over \(\mathbb{R}\) and \(\mathbb{Q}\) the characteristic polynomial has no roots and so \(B\) is not diagonalizable.
+  \item Over \(\mathbb{Z}_{2}\) the characteristic polynomial equals \(x^{2}\) but the 0 -eigenspace, \(\left\langle(1,1)^{T}\right\rangle\), is 1 dimensional. As \(g_{0}=1<2=a_{0}\) then \(B\) is not diagonalizable.
+  \item Over \(\mathbb{Z}_{3}\) the characteristic polynomials has no roots as \(-1=2\) has no square root and so \(B\) is not diagonalizable.
+  \item Over \(\mathbb{Z}_{5}\) we note \(-1=4=2^{2}\) and so \(x^{2}-2 x+2=(x+1)(x-3)\). As \(B\) has distinct eigenvalues it is diagonalizable.
+\end{itemize}
+
+Example 54 Show that the matrix \(A\) below is diagonalizable and find \(A^{n}\) where \(n\) is a positive integer.
+
+\[
+A=\left(\begin{array}{ccc}
+2 & 2 & -2 \\
+1 & 3 & -1 \\
+-1 & 1 & 1
+\end{array}\right)
+\]
+
+Solution. Adding column 2 of \(x I-A\) to column 1 , we can see that \(\chi_{A}(x)\) equals
+
+\[
+\begin{aligned}
+\left|\begin{array}{ccc}
+x-2 & -2 & 2 \\
+-1 & x-3 & 1 \\
+1 & -1 & x-1
+\end{array}\right| & =\left|\begin{array}{ccc}
+x-4 & -2 & 2 \\
+x-4 & x-3 & 1 \\
+0 & -1 & x-1
+\end{array}\right| \\
+& =\left|\begin{array}{ccc}
+x-4 & -2 & 2 \\
+0 & x-1 & -1 \\
+0 & -1 & x-1
+\end{array}\right|=(x-4)(x-2) x .
+\end{aligned}
+\]
+
+Hence the eigenvalues are \(\lambda=0,2,4\). That they are distinct implies immediately that \(A\) is diagonalizable. Note
+
+\[
+\begin{aligned}
+\lambda=0: & & \operatorname{ker}\left(\begin{array}{ccc}
+-2 & -2 & 2 \\
+-1 & -3 & 1 \\
+1 & -1 & -1
+\end{array}\right) & =\left\langle\left(\begin{array}{l}
+1 \\
+0 \\
+1
+\end{array}\right)\right\rangle ; \\
+\lambda=2: & & \operatorname{ker}\left(\begin{array}{ccc}
+0 & -2 & 2 \\
+-1 & -1 & 1 \\
+1 & -1 & 1
+\end{array}\right) & =\left\langle\left(\begin{array}{l}
+0 \\
+1 \\
+1
+\end{array}\right)\right\rangle ; \\
+\lambda=4: & & \operatorname{ker}\left(\begin{array}{ccc}
+2 & -2 & 2 \\
+-1 & 1 & 1 \\
+1 & -1 & 3
+\end{array}\right) & =\left\langle\left(\begin{array}{l}
+1 \\
+1 \\
+0
+\end{array}\right)\right\rangle .
+\end{aligned}
+\]
+
+So three independent eigenvectors are \((1,0,1)^{T},(0,1,1)^{T},(1,1,0)^{T}\). If we set
+
+\[
+P=\left(\begin{array}{ccc}
+1 & 0 & 1 \\
+0 & 1 & 1 \\
+1 & 1 & 0
+\end{array}\right) \quad \text { so that } \quad P^{-1}=\frac{1}{2}\left(\begin{array}{ccc}
+1 & -1 & 1 \\
+-1 & 1 & 1 \\
+1 & 1 & -1
+\end{array}\right)
+\]
+
+then \(P^{-1} A P=\operatorname{diag}(0,2,4)\) and \(P^{-1} A^{n} P=\left(P^{-1} A P\right)^{n}=\operatorname{diag}\left(0,2^{n}, 4^{n}\right)\). Finally \(A^{n}\) equals
+
+\[
+\begin{aligned}
+& \left(\begin{array}{lll}
+1 & 0 & 1 \\
+0 & 1 & 1 \\
+1 & 1 & 0
+\end{array}\right)\left(\begin{array}{ccc}
+0 & 0 & 0 \\
+0 & 2^{n} & 0 \\
+0 & 0 & 4^{n}
+\end{array}\right) \frac{1}{2}\left(\begin{array}{ccc}
+1 & -1 & 1 \\
+-1 & 1 & 1 \\
+1 & 1 & -1
+\end{array}\right) \\
+= & \left(\begin{array}{ccc}
+2^{2 n-1} & 2^{2 n-1} & -2^{2 n-1} \\
+2^{2 n-1}-2^{n-1} & 2^{n-1}+2^{2 n-1} & 2^{n-1}-2^{2 n-1} \\
+-2^{n-1} & 2^{n-1} & 2^{n-1}
+\end{array}\right) .
+\end{aligned}
+\]
+
+Example 55 Let
+
+\[
+A=\left(\begin{array}{ccc}
+6 & 1 & 2 \\
+0 & 7 & 2 \\
+0 & -2 & 2
+\end{array}\right)
+\]
+
+(a) Show that \(A\) has two eigenvalues \(\lambda_{1}\) and \(\lambda_{2}\). Is \(A\) diagonalizable?\\
+(b) Show further that \(A^{2}=\left(\lambda_{1}+\lambda_{2}\right) A-\lambda_{1} \lambda_{2} I\). Are there scalars \(a_{0}, a_{1}, \ldots, a_{n}\), for some \(n\), such that
+
+\[
+a_{n} A^{n}+a_{n-1} A^{n-1}+\cdots+a_{0} I=\operatorname{diag}(1,2,3) ?
+\]
+
+Solution. (a) We have
+
+\[
+\chi_{A}(x)=\left|\begin{array}{ccc}
+x-6 & -1 & -2 \\
+0 & x-7 & -2 \\
+0 & 2 & x-2
+\end{array}\right|=(x-6)\{(x-7)(x-2)+4\}=(x-6)^{2}(x-3) .
+\]
+
+As one of the eigenvalues is repeated then we cannot immediately decide on \(A\) 's diagonalizability. Investigating the repeated eigenvalue we see
+
+\[
+\lambda_{1}=6: \quad \operatorname{ker}\left(\begin{array}{ccc}
+0 & -1 & -2 \\
+0 & -1 & -2 \\
+0 & 2 & 4
+\end{array}\right)=\left\langle\left(\begin{array}{l}
+1 \\
+0 \\
+0
+\end{array}\right),\left(\begin{array}{c}
+0 \\
+2 \\
+-1
+\end{array}\right)\right\rangle
+\]
+
+and this is sufficient to confirm that \(A\) is diagonalizable. Further
+
+\[
+\begin{aligned}
+& A^{2}-\left(\lambda_{1}+\lambda_{2}\right) A+\lambda_{1} \lambda_{2} I \\
+= & A^{2}-9 A+18 I \\
+= & \left(\begin{array}{ccc}
+36 & 9 & 18 \\
+0 & 45 & 18 \\
+0 & -18 & 0
+\end{array}\right)-9\left(\begin{array}{ccc}
+6 & 1 & 2 \\
+0 & 7 & 2 \\
+0 & -2 & 2
+\end{array}\right)+\left(\begin{array}{ccc}
+18 & 0 & 0 \\
+0 & 18 & 0 \\
+0 & 0 & 18
+\end{array}\right)=0
+\end{aligned}
+\]
+
+So \(A^{2}=9 A-18 I\) can be written as a linear combination of \(A\) and \(I\), and likewise
+
+\[
+A^{3}=9 A^{2}-18 A=81 A-180 I
+\]
+
+can also be written as such a linear combination. More generally (say using a proof by induction) we find that any polynomial in \(A\) can be written as a linear combination of \(A\) and \(I\). However if \(\operatorname{diag}(1,2,3)=\alpha A+\beta I\) for some \(\alpha, \beta\) then, just looking at the diagonal entries, we'd have
+
+\[
+6 \alpha+\beta=1, \quad 7 \alpha+\beta=2, \quad 2 \alpha+\beta=3
+\]
+
+and, with a quick check, we see this system is inconsistent. Hence diag( \(1,2,3\) ) cannot be expressed as a polynomial in \(A\) and no such scalars \(a_{0}, a_{1}, \ldots, a_{n}\) exist.
+
+Example 56 Determine \(x_{n}\) and \(y_{n}\) where \(x_{0}=1, y_{0}=0\) and
+
+\[
+x_{n+1}=x_{n}-y_{n} \quad \text { and } \quad y_{n+1}=x_{n}+y_{n} \quad \text { for } n \geqslant 0
+\]
+
+Solution. We can rewrite the two recurrence relations as a single recurrence relation involving a vector, namely
+
+\[
+\binom{x_{n}}{y_{n}}=\left(\begin{array}{cc}
+1 & -1 \\
+1 & 1
+\end{array}\right)\binom{x_{n-1}}{y_{n-1}}=\left(\begin{array}{cc}
+1 & -1 \\
+1 & 1
+\end{array}\right)^{n}\binom{x_{0}}{y_{0}}
+\]
+
+From Example 47 we have
+
+\[
+P^{-1}\left(\begin{array}{cc}
+1 & -1 \\
+1 & 1
+\end{array}\right) P=\left(\begin{array}{cc}
+1+i & 0 \\
+0 & 1-i
+\end{array}\right) \quad \text { where } \quad P=\left(\begin{array}{cc}
+i & 1 \\
+1 & i
+\end{array}\right)
+\]
+
+So
+
+\[
+\begin{aligned}
+\left(\begin{array}{cc}
+1 & -1 \\
+1 & 1
+\end{array}\right)^{n} & =P\left(\begin{array}{cc}
+1+i & 0 \\
+0 & 1-i
+\end{array}\right)^{n} P^{-1} \\
+& =\left(\begin{array}{cc}
+i & 1 \\
+1 & i
+\end{array}\right)\left(\begin{array}{cc}
+(1+i)^{n} & 0 \\
+0 & (1-i)^{n}
+\end{array}\right)\left(-\frac{1}{2}\right)\left(\begin{array}{cc}
+i & -1 \\
+-1 & i
+\end{array}\right) \\
+& =\frac{1}{2}\left(\begin{array}{cc}
+(1+i)^{n}+(1-i)^{n} & i(1-i)^{n}-i(1+i)^{n} \\
+i(1-i)^{n}-i(1+i)^{n} & (1+i)^{n}+(1-i)^{n}
+\end{array}\right) \\
+& =\frac{1}{2}\left(\begin{array}{cc}
+2 \operatorname{Re}(1+i)^{n} & 2 \operatorname{Im}(1+i)^{n} \\
+2 \operatorname{Im}(1+i)^{n} & 2 \operatorname{Re}(1+i)^{n}
+\end{array}\right)
+\end{aligned}
+\]
+
+By De Moivre's theorem, and noting \(1+i=\sqrt{2} \operatorname{cis}(\pi / 4)\), we have
+
+\[
+\binom{x_{n}}{y_{n}}=\left(\begin{array}{cc}
+\operatorname{Re}(1+i)^{n} & \operatorname{Im}(1+i)^{n} \\
+\operatorname{Im}(1+i)^{n} & \operatorname{Re}(1+i)^{n}
+\end{array}\right)\binom{1}{0}=\binom{\operatorname{Re}(1+i)^{n}}{\operatorname{Im}(1+i)^{n}}=2^{n / 2}\binom{\cos (n \pi / 4)}{\sin (n \pi / 4)} .
+\]
+
+We briefly return to our first question from the start of the section: why might diagonalizability be a useful definition? We have seen that it can be computationally helpful, but representing a linear map by a diagonal matrix also helps us appreciate the effect of the linear map.
+
+For each choice of basis of a finite dimensional vector space, a linear map is represented by a certain matrix. So a sensible question is: is there a preferential basis to best describe the linear map? Certainly if we can produce a diagonal matrix representative this is optimal. But we recall that some matrices are not diagonalizable; this, in turn, invites the more refined question: into what preferred forms might we be able to change those matrices with a sensible choice of co-ordinates?
+
+Every square complex matrix is similar to a triangular matrix. In fact, we can do much better that this with the Jordan normal form being a very descriptive canonical form for complex matrices. Working over other fields the best we can do is the Frobenius normal form or the rational canonical form. These are results covered in the second year.
+
+\section*{3. THE SPECTRAL THEOREM}
+In the previous two chapters we have solely been interested in making an invertible change of variable. That is, the change of basis matrix \(P\) need only be invertible. When we make an invertible change of variable, algebraic properties such as
+
+\begin{itemize}
+  \item determinant, trace, eigenvalues, dimension, rank, invertibility\\
+are all preserved. However geometric properties are not typically preserved such as:
+  \item length, angle, area and volume, scalar product, normal forms of curves and surfaces.
+\end{itemize}
+
+For example the curve with equation
+
+\[
+x^{2}+y^{2}=1
+\]
+
+under the invertible change of variable
+
+\[
+X=2 x, \quad Y=3 y
+\]
+
+takes on the equation
+
+\[
+\frac{X^{2}}{4}+\frac{Y^{2}}{9}=1
+\]
+
+What was a circle with area \(\pi\) has become an ellipse with area \(6 \pi\).\\
+Should we wish to make changes of variable which preserve geometric properties then we need to make an orthogonal change of variable.
+
+Definition 57 An \(n \times n\) matrix \(P\) is orthogonal if \(P^{-1}=P^{T}\).\\
+This is equivalent to the columns (or rows) of \(P\) being unit length and mutually perpendicular. That is to say, the columns (or rows) of \(P\) form an orthonormal basis of \(\mathbb{R}_{\mathrm{col}}^{n}\) (or \(\mathbb{R}^{n}\) ).
+
+Proposition 58 The orthogonal matrices are precisely the matrices which preserve the scalar product. That is
+
+\[
+P \mathbf{x} \cdot P \mathbf{y}=\mathbf{x} \cdot \mathbf{y} \quad \text { for all } \mathbf{x}, \mathbf{y} \in \mathbb{R}_{\mathrm{col}}^{n} \quad \Longleftrightarrow \quad P \text { is orthogonal. }
+\]
+
+Proof. Let \(P\) be an orthogonal matrix. Then
+
+\[
+P \mathbf{x} \cdot P \mathbf{y}=(P \mathbf{x})^{T} P \mathbf{y}=\mathbf{x}^{T} P^{T} P \mathbf{y}=\mathbf{x}^{T} \mathbf{y}=\mathbf{x} \cdot \mathbf{y}
+\]
+
+Conversely assume \(P \mathbf{x} \cdot P \mathbf{y}=\mathbf{x} \cdot \mathbf{y}\) for all \(\mathbf{x}, \mathbf{y} \in \mathbb{R}_{\text {col }}^{n}\). If we set \(\mathbf{x}=\mathbf{e}_{i}^{T}\) and \(\mathbf{y}=\mathbf{e}_{j}^{T}\) then
+
+\[
+\left[P^{T} P\right]_{i j}=\mathbf{e}_{i} P^{T} P \mathbf{e}_{j}^{T}=P \mathbf{e}_{i}^{T} \cdot P \mathbf{e}_{j}^{T}=\mathbf{e}_{i}^{T} \cdot \mathbf{e}_{j}^{T}=\mathbf{e}_{i} \mathbf{e}_{j}^{T}=\delta_{i j}=[I]_{i j}
+\]
+
+As this is true for each \(i, j\) then \(P^{T} P=I\) and so \(P\) is orthogonal.\\
+A first question then is: what matrices can be diagonalized by an orthogonal change of variables? Say that
+
+\[
+P^{-1} A P=D
+\]
+
+where \(D\) is diagonal and \(P\) is orthogonal. Then \(A=P D P^{-1}=P D P^{T}\), so
+
+\[
+A^{T}=\left(P D P^{T}\right)^{T}=P^{T T} D^{T} P^{T}=P D P^{T}=A
+\]
+
+Thus if a matrix \(A\) is orthogonally diagonalizable it is necessarily symmetric. The converse happens to be true and is known as the spectral theorem:
+
+\begin{itemize}
+  \item Spectral Theorem: Let \(A\) be an \(n \times n\) symmetric matrix. Then the roots of \(\chi_{A}\) are real and \(A\) has an eigenbasis consisting of mutually perpendicular unit vectors. That is, \(A\) has an orthonormal eigenbasis.
+\end{itemize}
+
+We prove a first result towards the proof. Recall that eigenvectors associated with distinct eigenvalues are independent - the corresponding result for symmetric matrices shows that they're perpendicular.
+
+Proposition 59 Let \(A\) be a real \(n \times n\) symmetric matrix. If \(\mathbf{v}\) and \(\mathbf{w}\) are eigenvectors of \(A\) with associated eigenvalues \(\lambda\) and \(\mu\), where \(\lambda \neq \mu\), then \(\mathbf{v} \cdot \mathbf{w}=0\).
+
+Proof. We have that \(A \mathbf{v}=\lambda \mathbf{v}\) and \(A \mathbf{w}=\mu \mathbf{w}\) where \(\lambda \neq \mu\). Then, as \(A\) is symmetric, we have
+
+\[
+\lambda \mathbf{v} \cdot \mathbf{w}=\lambda \mathbf{v}^{T} \mathbf{w}=(\lambda \mathbf{v})^{T} \mathbf{w}=(A \mathbf{v})^{T} \mathbf{w}=\mathbf{v}^{T} A^{T} \mathbf{w}=\mathbf{v}^{T} A \mathbf{w}=\mathbf{v}^{T} \mu \mathbf{w}=\mu \mathbf{v} \cdot \mathbf{w}
+\]
+
+As \(\lambda \neq \mu\) then \(\mathbf{v} \cdot \mathbf{w}=0\).\\
+Example 60 Let
+
+\[
+A=\left(\begin{array}{cc}
+1 & \frac{1}{2} \\
+\frac{1}{2} & 1
+\end{array}\right)
+\]
+
+(a) Find an orthogonal matrix \(P\) such that \(P^{T} A P\) is diagonal.\\
+(b) Show that the curve \(x^{2}+x y+y^{2}=1\) is an ellipse, and find its area. Sketch the curve.
+
+Solution. (a) Note
+
+\[
+\chi_{A}(x)=(1-x)^{2}-\frac{1}{4}=\left(x-\frac{1}{2}\right)\left(x-\frac{3}{2}\right) .
+\]
+
+When
+
+\[
+\begin{aligned}
+\lambda=\frac{1}{2}: & \operatorname{ker}\left(\begin{array}{cc}
+\frac{1}{2} & \frac{1}{2} \\
+\frac{1}{2} & \frac{1}{2}
+\end{array}\right)=\left\langle\begin{array}{c}
+1 \\
+-1
+\end{array}\right\rangle \\
+\lambda=\frac{3}{2}: & \operatorname{ker}\left(\begin{array}{cc}
+-\frac{1}{2} & \frac{1}{2} \\
+\frac{1}{2} & -\frac{1}{2}
+\end{array}\right)=\left\langle\begin{array}{l}
+1 \\
+1
+\end{array}\right\rangle
+\end{aligned}
+\]
+
+Note that the \(\frac{1}{2}\)-eigenvectors and \(\frac{3}{2}\)-eigenvectors are perpendicular to one another - this was bound to be the case by the previous proposition. The eigenvectors \((1,-1)^{T}\) and \((1,1)^{T}\) cannot\\
+be the columns of an orthogonal matrix, but if we normalize them to unit vectors then they form the columns of an orthogonal matrix. Thus we set
+
+\[
+P=\frac{1}{\sqrt{2}}\left(\begin{array}{cc}
+1 & 1 \\
+-1 & 1
+\end{array}\right),
+\]
+
+noting this matrix rotates the plane by \(\pi / 4\) clockwise about the origin. We then have
+
+\[
+\begin{aligned}
+P^{T} A P & =\frac{1}{\sqrt{2}}\left(\begin{array}{cc}
+1 & -1 \\
+1 & 1
+\end{array}\right)\left(\begin{array}{cc}
+1 & \frac{1}{2} \\
+\frac{1}{2} & 1
+\end{array}\right) \frac{1}{\sqrt{2}}\left(\begin{array}{cc}
+1 & 1 \\
+-1 & 1
+\end{array}\right) \\
+& =\frac{1}{2}\left(\begin{array}{cc}
+\frac{1}{2} & -\frac{1}{2} \\
+\frac{3}{2} & \frac{3}{2}
+\end{array}\right)\left(\begin{array}{cc}
+1 & 1 \\
+-1 & 1
+\end{array}\right) \\
+& =\frac{1}{2}\left(\begin{array}{cc}
+1 & 0 \\
+0 & 3
+\end{array}\right)=\left(\begin{array}{cc}
+\frac{1}{2} & 0 \\
+0 & \frac{3}{2}
+\end{array}\right) .
+\end{aligned}
+\]
+
+(b) The equation \(x^{2}+x y+y^{2}=1\) can be rewritten as
+
+\[
+\left(\begin{array}{ll}
+x & y
+\end{array}\right)\left(\begin{array}{cc}
+1 & \frac{1}{2} \\
+\frac{1}{2} & 1
+\end{array}\right)\binom{x}{y}=1
+\]
+
+Making the change of variable
+
+\[
+\binom{x}{y}=P\binom{X}{Y},
+\]
+
+the equation \(1=(x y) A(x y)^{T}\) becomes
+
+\[
+1=(X Y) P^{T} A P(X Y)^{T}=\frac{1}{2} X^{2}+\frac{3}{2} Y^{2}
+\]
+
+This is the equation of an ellipse with semi-axes of length \(a=\sqrt{2}\) and \(b=\sqrt{2 / 3}\) and with area
+
+\[
+\pi a b=\frac{2 \pi}{\sqrt{3}}
+\]
+
+We can say the curve is an ellipse, and calculate its area, as the change of variable is orthogonal. The \(X Y\)-axes are given by
+
+\[
+\begin{aligned}
+& X \text {-axis or } Y=0 \text { is in the direction of } P(1,0)^{T}, \text { so is the line } x+y=0 \text {; } \\
+& Y \text {-axis or } X=0 \text { is in the direction of } P(0,1)^{T}, \text { so is the line } y=x .
+\end{aligned}
+\]
+
+A sketch of the ellipse, with the \(X Y\)-axes labelled, is given in Figure 1 below.
+
+\begin{figure}[h]
+\begin{center}
+  \includegraphics[alt={},max width=\textwidth]{9d11bf52-37a9-4f37-a2d9-6eea03a08979-35_520_496_1950_788}
+\captionsetup{labelformat=empty}
+\caption{Figure 1: \(x^{2}+x y+y^{2}=1\)}
+\end{center}
+\end{figure}
+
+When an \(n \times n\) matrix has distinct eigenvalues then we can find \(n\) eigenvectors which are independent and so form an eigenbasis; we can create an invertible matrix \(P\) with those eigenvectors as the columns of \(P\). Similarly when a symmetric \(n \times n\) matrix has distinct eigenvalues then we can find \(n\) eigenvectors which are orthogonal (and thus independent) and so form an eigenbasis; the matrix \(P\) with those eigenvectors as its columns will not in general be orthogonal, but if we normalize the eigenvectors - scale them to unit length - then the matrix \(P\) will be orthogonal as its columns will be mutually perpendicular and unit length (i.e. orthonormal).
+
+When an \(n \times n\) matrix has repeated eigenvalues then there may not be any eigenbasis. This cannot happen when a symmetric square matrix has repeated eigenvalues, but this result is reasonably sophisticated. In particular, we will need to prove the following for symmetric matrices:
+
+\begin{itemize}
+  \item The roots of the characteristic polynomial are real.
+  \item The direct sum of the eigenspaces is the entire space.
+  \item Each eigenspace has an orthonormal basis.
+\end{itemize}
+
+We begin by demonstrating the first result\\
+Proposition 61 Let \(A\) be a real \(n \times n\) symmetric matrix. The roots of \(\chi_{A}(x)\) are real.\\
+Proof. Let \(\lambda\) be a (potentially complex) root of \(\chi_{A}\). Then by (an appropriate complex version of) Proposition 41(a), there is a non-zero complex vector \(\mathbf{v}\) in \(\mathbb{C}_{\text {col }}^{n}\) such that \(A \mathbf{v}=\lambda \mathbf{v}\). As the entries of \(A\) are real, when we conjugate this equation we obtain \(A \overline{\mathbf{v}}=\bar{\lambda} \overline{\mathbf{v}}\). As \(A=A^{T}\), and by the product rule for transposes, we see
+
+\[
+\bar{\lambda} \overline{\mathbf{v}}^{T} \mathbf{v}=(\bar{\lambda} \overline{\mathbf{v}})^{T} \mathbf{v}=(A \overline{\mathbf{v}})^{T} \mathbf{v}=\overline{\mathbf{v}}^{T} A^{T} \mathbf{v}=\overline{\mathbf{v}}^{T} A \mathbf{v}=\overline{\mathbf{v}}^{T} \lambda \mathbf{v}=\lambda \overline{\mathbf{v}}^{T} \mathbf{v}
+\]
+
+Now for any non-zero complex vector \(\mathbf{v}=\left(v_{1}, v_{2}, \ldots, v_{n}\right)^{T}\) we have
+
+\[
+\overline{\mathbf{v}}^{T} \mathbf{v}=\overline{\mathbf{v}} \cdot \mathbf{v}=\overline{v_{1}} v_{1}+\cdots+\overline{v_{n}} v_{n}=\left|v_{1}\right|^{2}+\cdots+\left|v_{n}\right|^{2}>0 .
+\]
+
+As \((\bar{\lambda}-\lambda) \overline{\mathbf{v}}^{T} \mathbf{v}=0\) then \(\lambda=\bar{\lambda}\) and so \(\lambda\) is real.\\
+We now move on to the third bullet point: we will demonstrate that any subspace of \(\mathbb{R}^{n}\) has an orthonormal basis. This result then applies to eigenspaces as they are subspaces. Our first result is to show how an orthonormal set can be constructed from a linearly independent one.
+
+Say that \(\mathbf{v}_{1}, \mathbf{v}_{2}, \ldots, \mathbf{v}_{k}\) is an independent set in \(\mathbb{R}^{n}\); we shall construct an orthonormal basis \(\mathbf{w}_{1}, \mathbf{w}_{2}, \ldots, \mathbf{w}_{k}\) such that
+
+\[
+\left\langle\mathbf{v}_{1}, \mathbf{v}_{2}, \ldots, \mathbf{v}_{i}\right\rangle=\left\langle\mathbf{w}_{1}, \mathbf{w}_{2}, \ldots, \mathbf{w}_{i}\right\rangle \quad \text { for } 1 \leqslant i \leqslant k .
+\]
+
+There are, in fact, only limited ways of doing this. As \(\left\langle\mathbf{w}_{1}\right\rangle=\left\langle\mathbf{v}_{1}\right\rangle\) then \(\mathbf{w}_{1}\) is a scalar multiple of \(\mathbf{v}_{1}\). But as \(\mathbf{w}_{1}\) is a unit vector then \(\mathbf{w}_{1}= \pm \mathbf{v}_{1} /\left|\mathbf{v}_{1}\right|\). So there are only two choices for \(\mathbf{w}_{1}\) and it seems most natural to take \(\mathbf{w}_{1}=\mathbf{v}_{1} /\left|\mathbf{v}_{1}\right|\) (rather than needlessly introducing a negative\\
+sign). With this choice of \(\mathbf{w}_{1}\) we then need to find a unit vector \(\mathbf{w}_{2}\) perpendicular to \(\mathbf{w}_{1}\) and such that \(\left\langle\mathbf{w}_{1}, \mathbf{w}_{2}\right\rangle=\left\langle\mathbf{v}_{1}, \mathbf{v}_{2}\right\rangle\). In particular, we have
+
+\[
+\mathbf{v}_{2}=\alpha \mathbf{w}_{1}+\beta \mathbf{w}_{2} \quad \text { for some scalars } \alpha, \beta .
+\]
+
+We require \(\mathbf{w}_{2}\) to be perpendicular to \(\mathbf{w}_{1}\) and so \(\alpha=\mathbf{v}_{2} \cdot \mathbf{w}_{1}\) as \(\mathbf{w}_{1} \cdot \mathbf{w}_{1}=1\). Note that
+
+\[
+\mathbf{y}_{2}=\beta \mathbf{w}_{2}=\mathbf{v}_{2}-\left(\mathbf{v}_{2} \cdot \mathbf{w}_{1}\right) \mathbf{w}_{1}
+\]
+
+is the component of \(\mathbf{v}_{2}\) perpendicular to \(\mathbf{v}_{1}\), and \(\mathbf{y}_{2} \neq \mathbf{0}\) as \(\mathbf{w}_{1}\) is independent of \(\mathbf{v}_{2}\). We then have \(\mathbf{w}_{2}= \pm \mathbf{y}_{2} /\left|\mathbf{y}_{2}\right|\). Again we have two choices of \(\mathbf{w}_{2}\) but again there is no particular reason to choose the negative option.
+
+\begin{figure}[h]
+\begin{center}
+  \includegraphics[alt={},max width=\textwidth]{9d11bf52-37a9-4f37-a2d9-6eea03a08979-37_860_521_863_772}
+\captionsetup{labelformat=empty}
+\caption{Figure 2: GSOP example}
+\end{center}
+\end{figure}
+
+The diagram above hopefully captures the geometric nature of this process. \(\mathbf{v}_{1}\) spans a line and so there are only two unit vectors parallel to it with \(\mathbf{w}_{1}=\mathbf{v}_{1} /\left|\mathbf{v}_{1}\right|\) being a more natural choice than its negative. \(\left\langle\mathbf{v}_{1}, \mathbf{v}_{2}\right\rangle\) is a plane divided into two half-planes by the line \(\left\langle\mathbf{v}_{1}\right\rangle\) and there are two choices of unit vector in this plane which are perpendicular to the line. We choose \(\mathbf{w}_{2}\) to be that unit vector pointing into the same half-plane as \(\mathbf{v}_{2}\) does. Continuing, \(\left\langle\mathbf{v}_{1}, \mathbf{v}_{2}, \mathbf{v}_{3}\right\rangle\) is a three-dimensional space divided it into two half-spaces by the plane \(\left\langle\mathbf{v}_{1}, \mathbf{v}_{2}\right\rangle\). There are two choices of unit vector in this space which are perpendicular to the plane. We choose \(\mathbf{w}_{3}\) to be that unit vector pointing into the same half-space as \(\mathbf{v}_{3}\) does. This process is known as the Gram-Schmidt orthogonalization process (GSOP), \({ }^{1}\) with the rigorous details appearing below.
+
+\footnotetext{\({ }^{1}\) Named after the Danish mathematician Jorgen Pedersen Gram (1850-1916) and the German mathematician Erhard Schmidt (1876-1959). The orthogonalization process was employed by Gram in a paper of 1883 and by Schmidt, with acknowledgements to Gram, in a 1907 paper, but in fact the process had also been used by Laplace as early as 1812 .
+}Theorem 62 (Gram-Schmidt Orthogonalization Process (GSOP)) Let \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{k}\) be independent vectors in \(\mathbb{R}_{\text {col }}^{n}\) (or \(\mathbb{R}^{n}\) ). Then there are orthonormal vectors \(\mathbf{w}_{1}, \ldots, \mathbf{w}_{k}\) such that, for each \(1 \leqslant i \leqslant k\), we have
+
+\[
+\left\langle\mathbf{w}_{1}, \ldots, \mathbf{w}_{i}\right\rangle=\left\langle\mathbf{v}_{1}, \ldots, \mathbf{v}_{i}\right\rangle
+\]
+
+Proof. We will prove this by induction on \(i\). The result is seen to be true for \(i=1\) by taking \(\mathbf{w}_{1}=\mathbf{v}_{1} /\left|\mathbf{v}_{1}\right|\). Suppose now that \(1 \leqslant I<k\) and that we have so far produced orthonormal vectors \(\mathbf{w}_{1}, \ldots, \mathbf{w}_{I}\) such that (3.1) is true for \(1 \leqslant i \leqslant I\). We then set
+
+\[
+\mathbf{y}_{I+1}=\mathbf{v}_{I+1}-\sum_{j=1}^{I}\left(\mathbf{v}_{I+1} \cdot \mathbf{w}_{j}\right) \mathbf{w}_{j}
+\]
+
+Note that, for \(1 \leqslant i \leqslant I\),
+
+\[
+\mathbf{y}_{I+1} \cdot \mathbf{w}_{i}=\mathbf{v}_{I+1} \cdot \mathbf{w}_{i}-\sum_{j=1}^{I}\left(\mathbf{v}_{I+1} \cdot \mathbf{w}_{j}\right) \delta_{i j}=\mathbf{v}_{I+1} \cdot \mathbf{w}_{i}-\mathbf{v}_{I+1} \cdot \mathbf{w}_{i}=0
+\]
+
+So \(\mathbf{y}_{I+1}\) is perpendicular to each of \(\mathbf{w}_{1}, \ldots, \mathbf{w}_{I}\). Further \(\mathbf{y}_{I+1}\) is non-zero, for if \(\mathbf{y}_{I+1}=\mathbf{0}\) then
+
+\[
+\mathbf{v}_{I+1}=\sum_{j=1}^{I}\left(\mathbf{v}_{I+1} \cdot \mathbf{w}_{j}\right) \mathbf{w}_{j} \quad \text { is in } \quad\left\langle\mathbf{w}_{1}, \ldots, \mathbf{w}_{I}\right\rangle=\left\langle\mathbf{v}_{1}, \ldots, \mathbf{v}_{I}\right\rangle
+\]
+
+which contradicts the linear independence of \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{I}, \mathbf{v}_{I+1}\). If we set \(\mathbf{w}_{I+1}=\mathbf{y}_{I+1} /\left|\mathbf{y}_{I+1}\right|\), it follows from (3.2) that \(\mathbf{w}_{1}, \ldots, \mathbf{w}_{I+1}\) form an orthonormal set. Further
+
+\[
+\left\langle\mathbf{w}_{1}, \ldots, \mathbf{w}_{I+1}\right\rangle=\left\langle\mathbf{w}_{1}, \ldots, \mathbf{w}_{I}, \mathbf{y}_{I+1}\right\rangle=\left\langle\mathbf{w}_{1}, \ldots, \mathbf{w}_{I}, \mathbf{v}_{I+1}\right\rangle=\left\langle\mathbf{v}_{1}, \ldots, \mathbf{v}_{I}, \mathbf{v}_{I+1}\right\rangle
+\]
+
+and the proof follows by induction.\\
+Corollary 63 Every subspace of \(\mathbb{R}^{n}\left(\right.\) or \(\left.\mathbb{R}_{\mathrm{col}}^{n}\right)\) has an orthonormal basis.\\
+Proof. If \(U\) is a subspace of \(\mathbb{R}^{n}\) then it has a basis \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{k}\). By applying the GSOP process, an orthonormal set \(\mathbf{w}_{1}, \ldots, \mathbf{w}_{k}\) can be constructed from them which is a basis for \(U\) as
+
+\[
+\left\langle\mathbf{w}_{1}, \ldots, \mathbf{w}_{k}\right\rangle=\left\langle\mathbf{v}_{1}, \ldots, \mathbf{v}_{k}\right\rangle=U
+\]
+
+Corollary 64 An orthonormal set can be extended to an orthonormal basis.\\
+Proof. Let \(\mathbf{w}_{1}, \ldots, \mathbf{w}_{k}\) be an orthonormal set in \(\mathbb{R}^{n}\). In particular it is linearly independent and so may be extended to a basis \(\mathbf{w}_{1}, \ldots, \mathbf{w}_{k}, \mathbf{v}_{k+1}, \ldots, \mathbf{v}_{n}\) for \(\mathbb{R}^{n}\). The GSOP can then be applied to construct an orthonormal basis \(\mathbf{x}_{1}, \ldots, \mathbf{x}_{n}\) from this basis. The nature of the GSOP means that \(\mathbf{x}_{i}=\mathbf{w}_{i}\) for \(1 \leqslant i \leqslant k\) and so our orthonormal basis is an extension of the original orthonormal set.
+
+We now prove the earlier second bullet point, that the eigenspaces of a symmetric matrix \(A\) form a direct sum for the entire space. Eigenvectors from different eigenspaces are automatically orthogonal to one another (Proposition 59) and via GSOP we now know there exists an orthonormal basis for each eigenspace. We will show the union of the orthonormal bases for the eigenspaces then makes an orthonormal eigenbasis. All this is equivalent to showing that there is an orthogonal matrix \(P\) such that \(P^{T} A P\) is diagonal - we create \(P\) by having the orthonormal eigenbasis as its columns.
+
+Theorem 65 (Spectral Theorem \({ }^{2}\) ) Let \(A\) be a real symmetric \(n \times n\) matrix. Then there exists an orthogonal \(n \times n\) matrix \(P\) such that \(P^{T} A P\) is diagonal.
+
+Proof. We shall prove the result by strong induction on \(n\). When \(n=1\) there is nothing to prove as all \(1 \times 1\) matrices are diagonal and so we can simply take \(P=I_{1}\).
+
+Suppose now that the result holds for \(r \times r\) real symmetric matrices where \(1 \leqslant r<n\). By the fundamental theorem of algebra, the characteristic polynomial \(\chi_{A}\) has a root \(\lambda\) in \(\mathbb{C}\), which by Proposition 61 we in fact know to be real. Let \(X\) denote the \(\lambda\)-eigenspace, that is
+
+\[
+X=\left\{\mathbf{v} \in \mathbb{R}_{\mathrm{col}}^{n} \mid A \mathbf{v}=\lambda \mathbf{v}\right\}
+\]
+
+So \(X=\operatorname{ker}(A-\lambda I)\) is a non-zero subspace, as \(\lambda\) is an eigenvalue, and has an orthonormal basis \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{m}\). Extend this to an orthonormal basis \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{n}\) for \(\mathbb{R}_{\text {col }}^{n}\) and set \(P=\left(\mathbf{v}_{1}|\ldots| \mathbf{v}_{n}\right)\), which is orthogonal.
+
+Now \(P^{T} A P\) is the matrix of \(L_{A}\) with respect to the basis \(\mathbf{v}_{1}, \ldots, \mathbf{v}_{n}\). For \(1 \leqslant i \leqslant m\) we have \(A \mathbf{v}_{i}=\lambda \mathbf{v}_{i}\) and therefore the \(i\) th column of \(P^{T} A P\) is \(\lambda \mathbf{e}_{i}^{T}\). Further \(P^{T} A P\) is symmetric as
+
+\[
+\left(P^{T} A P\right)^{T}=P^{T} A^{T} P^{T T}=P^{T} A P
+\]
+
+by the product rule for transposes and as \(A\) is symmetric. Hence
+
+\[
+P^{T} A P=\operatorname{diag}\left(\lambda I_{m}, M\right)
+\]
+
+where \(M\) is a symmetric \((n-m) \times(n-m)\) matrix. By our inductive hypothesis there is an orthogonal \((n-m) \times(n-m)\) matrix \(Q\) such that \(Q^{T} M Q\) is diagonal. If we set \(R=\operatorname{diag}\left(I_{m}, Q\right)\) then \(R\) is orthogonal, \(P R\) is orthogonal and
+
+\[
+\begin{aligned}
+(P R)^{T} A(P R) & =R^{T} P^{T} A P R \\
+& =\operatorname{diag}\left(I_{m}, Q^{T}\right) \operatorname{diag}\left(\lambda I_{m}, M\right) \operatorname{diag}\left(I_{m}, Q\right) \\
+& =\operatorname{diag}\left(\lambda I_{m}, Q^{T} M Q\right)
+\end{aligned}
+\]
+
+is diagonal. This concludes the proof by induction.
+
+\footnotetext{\({ }^{2}\) Appreciation of this result, at least in two variables, dates back to Descartes and Fermat. But the equivalent general result was first proven by Cauchy in 1829, though independently of the language of matrices, which were yet to be invented. Rather Cauchy's result was in terms of quadratic forms - a quadratic form in two variables is an expression of the form \(a x^{2}+b x y+c y^{2}\).
+}Corollary 66 Let \(A\) be a symmetric \(n \times n\) real matrix. Then there exists an invertible matrix \(S\) such that
+
+\[
+S^{T} A S=\operatorname{diag}\left(I_{k},-I_{l}, 0_{m}\right)
+\]
+
+where \(k+l+m=n\). Then \(k+l\) is the rank of \(A\) and \(k-l\) is called the signature of \(A\).\\
+Proof. By the spectral theorem there is an orthogonal matrix \(P\) such that
+
+\[
+P^{T} A P=\operatorname{diag}\left(D_{k},-D_{l}, 0_{m}\right)
+\]
+
+where \(D_{k}\) and \(D_{l}\) are diagonal matrices with positive entries. (The columns of \(P\) can be rearranged in the order of positive-eigenvalue eigenvectors, then negative, then zero.) There are natural, invertible square roots \(\sqrt{D_{k}}\) and \(\sqrt{D_{l}}\) for these two matrices and then set
+
+\[
+Q=\operatorname{diag}\left(\left(\sqrt{D_{k}}\right)^{-1},\left(\sqrt{D_{l}}\right)^{-1}, I_{m}\right)
+\]
+
+Setting \(S=Q P\) yields the required result.\\
+Remark 67 (Off syllabus) Sylvester's law of inertia, proved in 1852, shows that the rank and signature of \(A\) are independent of the choice of \(S\).
+
+Corollary \(68 A\) real symmetric matrix \(A\) is said to be:
+
+\begin{itemize}
+  \item positive definite if \(\mathbf{x}^{T} A \mathbf{x}>0\) for all \(\mathbf{x} \neq \mathbf{0}\);
+  \item positive semi-definite if \(\mathbf{x}^{T} A \mathbf{x} \geqslant 0\) for all \(\mathbf{x}\);
+  \item negative definite if \(\mathbf{x}^{T} A \mathbf{x}<0\) for all \(\mathbf{x} \neq \mathbf{0}\);
+  \item negative semi-definite if \(\mathbf{x}^{T} A \mathbf{x} \leqslant 0\) for all \(\mathbf{x}\);
+  \item indefinite otherwise.
+\end{itemize}
+
+From the spectral theorem we see that these correspond respectively to the eigenvalues of \(A\) being (i) all positive, (ii) all non-negative, (iii) all negative, (iv) all non-positive, (v) positive, negative and possibly zero.
+
+Remark 69 (Hermitian matrices) There is a version of the spectral theorem over the complex numbers. The standard inner product on \(\mathbb{C}^{n}\) is given by
+
+\[
+\langle\mathbf{z}, \mathbf{w}\rangle=\mathbf{z} \cdot \overline{\mathbf{w}}=z_{1} \overline{w_{1}}+\cdots+z_{n} \overline{w_{n}}
+\]
+
+So the equivalent of the orthogonal matrices are the unitary matrices which satisfy \(U^{-1}=\bar{U}^{T}\). These are precisely the matrices that preserve the complex inner product. And the equivalent of symmetric matrices are the hermitian matrices \({ }^{3}\) which satisfy \(M=\bar{M}^{T}\). The complex version of the spectral theorem then states that, for any hermitian matrix \(M\) there exists a unitary matrix \(U\) such that \(\bar{U}^{T} M U\) is diagonal with real entries. Hermitian matrices are particularly important in quantum theory as they represent observables such as position and momentum. Heisenberg's uncertainty principle is a consequence of two hermitian matrices not commuting.
+
+\footnotetext{\({ }^{3}\) After the French mathematician, Charles Hermite (1822-1901).
+}Remark 70 We saw earlier that the theory of diagonalization applies equally well over any field, mainly because it is part of theory of vector spaces and linear maps. By contrast the spectral theorem is best set in the context of inner product spaces and so there is a spectral theorem only for symmetric matrices over \(\mathbb{R}\) and for Hermitian matrices over \(\mathbb{C}\), these being the linear maps which respect the inner product. There is a more detailed comment on this matter at the end of the chapter.
+
+Example 71 For the matrix \(A\) below, find orthogonal \(P\) such that \(P^{T} A P\) is diagonal.
+
+\[
+A=\left(\begin{array}{llll}
+0 & 1 & 1 & 1 \\
+1 & 0 & 1 & 1 \\
+1 & 1 & 0 & 1 \\
+1 & 1 & 1 & 0
+\end{array}\right)
+\]
+
+Solution. The characteristic polynomial of \(A\) is \(\chi_{A}(x)=(x+1)^{3}(x-3)\). A unit length 3eigenvector is \(\mathbf{v}_{1}=(1,1,1,1)^{T} / 2\) and the -1 -eigenspace is \(x_{1}+x_{2}+x_{3}+x_{4}=0\). So a basis for the -1 -eigenspace is
+
+\[
+(1,-1,0,0)^{T}, \quad(0,1,-1,0)^{T}, \quad(0,0,1,-1)^{T}
+\]
+
+However to find the last three columns of \(P\), we need an orthonormal basis for the -1 eigenspace. Applying the GSOP to the above three vectors, we arrive at
+
+\[
+\mathbf{v}_{2}=(1,-1,0,0)^{T} / \sqrt{2}, \quad \mathbf{v}_{3}=(1,1,-2,0)^{T} / \sqrt{6}, \quad \mathbf{v}_{4}=(1,1,1,-3)^{T} / \sqrt{12}
+\]
+
+Such a required matrix is then \(P=\left(\mathbf{v}_{1}\left|\mathbf{v}_{2}\right| \mathbf{v}_{3} \mid \mathbf{v}_{4}\right)\).\\
+Algorithm 72 (Orthogonal Diagonalization of a Symmetric Matrix) Let \(M\) be a symmetric matrix. The spectral theorem shows that \(M\) is diagonalizable and so has an eigenbasis. Setting an eigenbasis as the columns of a matrix \(P\) will yield an invertible matrix \(P\) such that \(P^{-1} M P\) is diagonal - in general though this \(P\) will not be orthogonal.
+
+If \(\mathbf{v}\) is an eigenvector of \(M\) whose eigenvalue is not repeated, then we replace it with \(\mathbf{v} /|\mathbf{v}|\). This new eigenvector is of unit length and is necessarily orthogonal to other eigenvectors with different eigenvalues (Proposition 59). If none of the eigenvalues is repeated, this is all we need do to the eigenbasis to produce an orthonormal eigenbasis.
+
+If \(\lambda\) is a repeated eigenvalue then we can find a basis for the \(\lambda\)-eigenspace. Applying the GSOP to this basis produces an orthonormal basis for the \(\lambda\)-eigenspace. Again these eigenvectors are orthogonal to all eigenvectors with different eigenvalues. We can see now that the previous non-repeated case is simply a special case of the repeated case: the Gram-Schmidt process for a single vector involving nothing other than normalizing it.
+
+Once the given basis for each eigenspace has had the GSOP applied to it, the entire eigenbasis has now been made orthonormal. We may put this orthonormal eigenbasis as the columns of a matrix \(P\) which will be orthogonal and such that \(P^{-1} M P=P^{T} M P\) is diagonal.
+
+Example 73 Find a \(2 \times 2\) real symmetric matrix \(M\) such that \(M^{2}=A\) where
+
+\[
+A=\left(\begin{array}{cc}
+3 & \sqrt{3} \\
+\sqrt{3} & 5
+\end{array}\right)
+\]
+
+Solution. The characteristic polynomial of \(A\) is
+
+\[
+\operatorname{det}(x I-A)=(x-3)(x-5)-(-\sqrt{3})^{2}=x^{2}-8 x+12=(x-2)(x-6)
+\]
+
+Determining the eigenvectors we see
+
+\[
+\begin{array}{ll}
+\lambda=2: & \operatorname{ker}\left(\begin{array}{cc}
+1 & \sqrt{3} \\
+\sqrt{3} & 3
+\end{array}\right)=\left\langle\binom{-\sqrt{3}}{1}\right\rangle, \quad \text { so take } \mathbf{v}_{1}=\frac{1}{2}\binom{-\sqrt{3}}{1} . \\
+\lambda=6: & \operatorname{ker}\left(\begin{array}{cc}
+-3 & \sqrt{3} \\
+-\sqrt{3} & 1
+\end{array}\right)=\left\langle\binom{ 1}{\sqrt{3}}\right\rangle, \quad \text { so take } \mathbf{v}_{2}=\frac{1}{2}\binom{1}{\sqrt{3}} .
+\end{array}
+\]
+
+So, with \(P=\left(\mathbf{v}_{1} \mid \mathbf{v}_{2}\right)\), we have \(P^{T} A P=\operatorname{diag}(2,6)\), which has a clear square root of \(\operatorname{diag}(\sqrt{2}, \sqrt{6})\). Thus we might choose
+
+\[
+M=P \operatorname{diag}(\sqrt{2}, \sqrt{6}) P^{T}=\frac{1}{4}\left(\begin{array}{cc}
+3 \sqrt{2}+\sqrt{6} & 3 \sqrt{2}-\sqrt{6} \\
+3 \sqrt{2}-\sqrt{6} & \sqrt{2}+3 \sqrt{6}
+\end{array}\right)
+\]
+
+Below are some important examples of symmetric matrices across mathematics and a description of their connection with quadratic forms.
+
+Example 74 (Gram matrices) The Gram matrix \(M\) for an inner product \(\langle, \quad\rangle\) on a vector space with basis \(\left\{v_{1}, \ldots, v_{n}\right\}\) has \((i, j)\) th entry
+
+\[
+[M]_{i j}=\left\langle v_{i}, v_{j}\right\rangle
+\]
+
+This is a symmetric, positive definite matrix - because of the properties of inner products - and conversely any symmetric, positive definite matrix is the Gram matrix of an inner product.
+
+Example 75 (Inertia matrix in dynamics) A rigid body, rotating about a fixed point \(O\) with angular velocity \(\boldsymbol{\omega}\) has kinetic energy
+
+\[
+T=\frac{1}{2} \boldsymbol{\omega}^{T} I_{0} \boldsymbol{\omega}
+\]
+
+where \(I_{0}\) is the inertia matrix
+
+\[
+I_{0}=\left(\begin{array}{ccc}
+A & -D & -E \\
+-D & B & -F \\
+-E & -F & C
+\end{array}\right),
+\]
+
+where
+
+\[
+\begin{aligned}
+A & =\iiint_{R} \rho\left(y^{2}+z^{2}\right) \mathrm{d} V, \quad B=\iiint_{R} \rho\left(x^{2}+z^{2}\right) \mathrm{d} V, \quad C=\iiint_{R} \rho\left(x^{2}+y^{2}\right) \mathrm{d} V \\
+D & =\iiint_{R} \rho y z \mathrm{~d} V, \quad E=\iiint_{R} \rho x z \mathrm{~d} V, \quad F=\iiint_{R} \rho x y \mathrm{~d} V
+\end{aligned}
+\]
+
+and where \(\rho\) denotes density and \(R\) is the region that the rigid body occupies. For a spinning top, symmetrical about its axis with \(O\) on the axis, the eigenvectors of \(I_{0}\) are along the axis with two eigenvectors orthogonal to that. Wrt this basis \(I_{0}=\operatorname{diag}(A, A, C)\), but the spectral theorem applies to any rigid body, however irregular the distribution of matter.
+
+Example 76 (Covariance and correlation matrices in probability and statistics) The covariance matrix \(\Sigma\) is a symmetric, positive semi-definite matrix giving the covariance between each pair of elements of a random vector. Given a random vector \(\mathbf{X}=\left(X_{1}, \ldots, X_{n}\right)^{T}\) the covariance matrix \(\Sigma\) is defined by
+
+\[
+[\Sigma]_{i, j}=\operatorname{cov}\left[X_{i}, X_{j}\right]=\mathbb{E}\left[\left(X_{i}-\mathbb{E}\left(X_{i}\right)\right)\left(Y_{j}-\mathbb{E}\left(X_{j}\right)\right)\right]
+\]
+
+or equally
+
+\[
+\Sigma=\mathbb{E}\left[\mathbf{X} \mathbf{X}^{T}\right]-\mathbb{E}(\mathbf{X}) \mathbb{E}(\mathbf{X})^{T}
+\]
+
+It follows from the spectral theorem that every symmetric positive semi-definite matrix is a covariance matrix. The matrix is important in the theory of principal component analysis (PCA).
+
+The correlation matrix \(C\) is similarly defined with
+
+\[
+[C]_{i j}=\frac{\operatorname{cov}\left[X_{i}, X_{j}\right]}{\sigma\left(X_{i}\right) \sigma\left(X_{j}\right)}
+\]
+
+\(C\) is a symmetric, positive semi-definite matrix with all its diagonal entries equalling 1 .\\
+One of the most important applications of the spectral theorem is the classification of quadratic forms.
+
+Definition 77 A quadratic form in \(n\) variables \(x_{1}, x_{2}, \ldots, x_{n}\) is a polynomial where each term has degree two. That is, it can be written as a sum
+
+\[
+\sum_{i \leqslant j} a_{i j} x_{i} x_{j}
+\]
+
+where the \(a_{i j}\) are scalars. Thus a quadratic form in two variables \(x, y\) is \(a x^{2}+b x y+c y^{2}\) where \(a, b, c\) are scalars.
+
+The following is a co-ordinate-free way of defining quadratic forms. A quadratic form on a vector space \(V\) equals
+
+\[
+B(v, v)
+\]
+
+where \(B: V \times V \rightarrow \mathbb{R}\) is a bilinear map.\\
+The connection with symmetric matrices is that we can write
+
+\[
+\sum_{i \leqslant j} a_{i j} x_{i} x_{j}=\mathbf{x}^{T} A \mathbf{x}
+\]
+
+where \(\mathbf{x}^{T}=\left(x_{1}, x_{2}, \ldots, x_{n}\right)\) and \(A\) is the symmetric matrix
+
+\[
+[A]_{i j}=\left\{\begin{array}{cc}
+a_{i i} & i=j \\
+\frac{1}{2} a_{i j} & i<j \\
+\frac{1}{2} a_{j i} & i>j
+\end{array} .\right.
+\]
+
+Thus, for example,
+
+\[
+a x^{2}+b x y+c y^{2}=\left(\begin{array}{ll}
+x & y
+\end{array}\right)\left(\begin{array}{cc}
+a & \frac{b}{2} \\
+\frac{b}{2} & c
+\end{array}\right)\binom{x}{y}
+\]
+
+Definition 78 When the spectral theorem is applied to quadratic forms it is often referred to as the principal axis theorem.
+
+There are many important examples of quadratic forms, some of which you may have met already:
+
+Example 79 (Conics) The general degree two equation in two variables has the form
+
+\[
+A x^{2}+B x y+C y^{2}+D x+E y+F=0
+\]
+
+where \(A, \ldots, F\) are real scalars and \(A, B, C\) are not all zero. This equation can be put into normal forms as follows. Firstly we can rewrite the equation as
+
+\[
+(x, y) M\binom{x}{y}+(D, E)\binom{x}{y}+F=0, \quad \text { where } \quad M=\left(\begin{array}{cc}
+A & B / 2 \\
+B / 2 & C
+\end{array}\right) \text {. }
+\]
+
+Note that \(M\) is symmetric. By the spectral theorem we know that there is a \(2 \times 2\) orthogonal matrix \(P\) which will diagonalize \(M\). If we set
+
+\[
+\binom{x}{y}=P\binom{X}{Y}
+\]
+
+then (3.3) becomes
+
+\[
+(X, Y) P^{T} M P\binom{X}{Y}+(D, E) P\binom{X}{Y}+F=0
+\]
+
+As \(P\) is orthogonal then this change of variable will not change any geometric aspects: distances, angles and areas remain unaltered. In these new variables \(X, Y\), and with \(P^{T} M P=\operatorname{diag}(\tilde{A}, \tilde{C})\) and \((D, E) P=(\tilde{D}, \tilde{E})\), our equation now reads as
+
+\[
+\tilde{A} X^{2}+\tilde{C} Y^{2}+\tilde{D} X+\tilde{E} Y+F=0
+\]
+
+We can now complete any squares to put this equation into normal form.
+
+\begin{itemize}
+  \item Ellipses have normal form
+\end{itemize}
+
+\[
+\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}=1 \quad(a \geqslant b>0)
+\]
+
+\begin{itemize}
+  \item Hyperbolae have normal form
+\end{itemize}
+
+\[
+\frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1 \quad(a, b>0)
+\]
+
+\begin{itemize}
+  \item Parabolae have normal form
+\end{itemize}
+
+\[
+y^{2}=4 a x \quad(a>0)
+\]
+
+Each ellipse, hyperbola, parabola can be uniquely put into one of the above forms by an isometry of the plane. The general degree two equation also leads to some degenerate cases such as parallel lines, intersecting lines, repeated lines, points and the empty set.
+
+\begin{figure}[h]
+\begin{center}
+  \includegraphics[alt={},max width=\textwidth]{9d11bf52-37a9-4f37-a2d9-6eea03a08979-45_515_840_507_246}
+\captionsetup{labelformat=empty}
+\caption{Figure 3a - ellipse}
+\end{center}
+\end{figure}
+
+\begin{figure}[h]
+\begin{center}
+  \includegraphics[alt={},max width=\textwidth]{9d11bf52-37a9-4f37-a2d9-6eea03a08979-45_641_517_1080_406}
+\captionsetup{labelformat=empty}
+\caption{Figure 3c - parabola}
+\end{center}
+\end{figure}
+
+\begin{figure}[h]
+\begin{center}
+  \includegraphics[alt={},max width=\textwidth]{9d11bf52-37a9-4f37-a2d9-6eea03a08979-45_506_716_516_1101}
+\captionsetup{labelformat=empty}
+\caption{Figure 3b - hyperbola}
+\end{center}
+\end{figure}
+
+\begin{figure}[h]
+\begin{center}
+  \includegraphics[alt={},max width=\textwidth]{9d11bf52-37a9-4f37-a2d9-6eea03a08979-45_636_641_1080_1139}
+\captionsetup{labelformat=empty}
+\caption{Figure 3d - degenerate case}
+\end{center}
+\end{figure}
+
+Example 80 (Quadrics) The spectral theorem applies equally well to the general degree two equation in three variables \(x, y, z\). The normal forms for the non-degenerate cases are
+
+\begin{itemize}
+  \item Ellipsoids have normal form
+\end{itemize}
+
+\[
+\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}+\frac{z^{2}}{c^{2}}=1 \quad(a \geqslant b \geqslant c) .
+\]
+
+\begin{itemize}
+  \item Hyperboloids of one sheet have normal form
+\end{itemize}
+
+\[
+\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}-\frac{z^{2}}{c^{2}}=1 \quad(a \geqslant b>0, c>0) .
+\]
+
+\begin{itemize}
+  \item Hyperboloids of two sheets have normal form
+\end{itemize}
+
+\[
+\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}-\frac{z^{2}}{c^{2}}=-1 \quad(a \geqslant b>0, c>0) .
+\]
+
+\begin{itemize}
+  \item Elliptic paraboloids have normal form
+\end{itemize}
+
+\[
+\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}-z=0 \quad(a \geqslant b>0)
+\]
+
+\begin{itemize}
+  \item Hyperbolic paraboloids have normal form
+\end{itemize}
+
+\[
+\frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}-z=0 \quad(a, b>0)
+\]
+
+Each of these non-degenerate cases be uniquely put into one of the above forms by an isometry of the space. The general degree two equation in three variables also leads to some degenerate cases such as parallel planes, intersecting planes, repeated planes, points, cones, elliptic parabolic and hyperbolic cylinders and the empty set.
+
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+\includegraphics[max width=\textwidth, alt={}]{9d11bf52-37a9-4f37-a2d9-6eea03a08979-46_402_137_1082_414}
+ & \includegraphics[max width=\textwidth, alt={}]{9d11bf52-37a9-4f37-a2d9-6eea03a08979-46_454_314_1057_882}
+ & \includegraphics[max width=\textwidth, alt={}]{9d11bf52-37a9-4f37-a2d9-6eea03a08979-46_388_316_1073_1478}
+ \\
+\hline
+Fig. 4a: ellipsoid \( \frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}+\frac{z^{2}}{c^{2}}=1 \) & Fig. 4b: elliptic paraboloid \( z=a^{2} x^{2}+b^{2} y^{2} \) & Fig. 4c: hyperbolic paraboloid \( z=a^{2} x^{2}-b^{2} y^{2} \) \\
+\hline
+\includegraphics[max width=\textwidth, alt={}]{9d11bf52-37a9-4f37-a2d9-6eea03a08979-46_399_311_1706_327}
+ & \includegraphics[max width=\textwidth, alt={}]{9d11bf52-37a9-4f37-a2d9-6eea03a08979-46_473_486_1683_806}
+ & \includegraphics[max width=\textwidth, alt={}]{9d11bf52-37a9-4f37-a2d9-6eea03a08979-46_413_330_1711_1487}
+ \\
+\hline
+Fig. 4d: 2 sheets hyperboloid & Figure 4e: 1 sheet hyperboloid & Fig. 4f: double cone \\
+\hline
+\(\frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}-\frac{z^{2}}{c^{2}}=1\) & \(\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}-\frac{z^{2}}{c^{2}}=1\) & \(z^{2}=\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}\). \\
+\hline
+\end{tabular}
+\end{center}
+
+Example 81 Show that the equation \(13 x^{2}+13 y^{2}+10 z^{2}+4 y z+4 z x+8 x y=1\) defines an ellipsoid and find its volume.
+
+Solution. Let
+
+\[
+A=\left(\begin{array}{ccc}
+13 & 4 & 2 \\
+4 & 13 & 2 \\
+2 & 2 & 10
+\end{array}\right)
+\]
+
+so that
+
+\[
+\mathbf{x}^{T} A \mathbf{x}=13 x^{2}+13 y^{2}+10 z^{2}+4 y z+4 z x+8 x y
+\]
+
+Note that \(\chi_{A}(x)\) equals
+
+\[
+\begin{aligned}
+& \left|\begin{array}{ccc}
+x-13 & -4 & -2 \\
+-4 & x-13 & -2 \\
+-2 & -2 & x-10
+\end{array}\right|=\left|\begin{array}{ccc}
+x-9 & 9-x & 0 \\
+-4 & x-13 & -2 \\
+-2 & -2 & x-10
+\end{array}\right|=(x-9)\left|\begin{array}{ccc}
+1 & -1 & 0 \\
+-4 & x-13 & -2 \\
+-2 & -2 & x-10
+\end{array}\right| \\
+& =(x-9)\left|\begin{array}{ccc}
+1 & 0 & 0 \\
+-4 & x-17 & -2 \\
+-2 & -4 & x-10
+\end{array}\right|=(x-9)\left(x^{2}-27 x+162\right)=(x-9)(x-18)(x-9)
+\end{aligned}
+\]
+
+This means that there is an orthogonal matrix \(P\) such that
+
+\[
+P^{T} A P=\operatorname{diag}(9,9,18)
+\]
+
+If we set \(\mathbf{x}=P \mathbf{X}\) then we see our quadric now has equation
+
+\[
+9 X^{2}+9 Y^{2}+18 Z^{2}=\mathbf{X}^{T} P^{T} A P \mathbf{X}=1
+\]
+
+which is an ellipsoid. Further we have
+
+\[
+a=\frac{1}{3}, \quad b=\frac{1}{3}, \quad c=\frac{1}{3 \sqrt{2}}
+\]
+
+and so, noting the orthogonal change of variable won't change the ellipsoid's volume, that volume equals
+
+\[
+\frac{4 \pi}{3} \times \frac{1}{3} \times \frac{1}{3} \times \frac{1}{3 \sqrt{2}}=\frac{2 \sqrt{2} \pi}{81}
+\]
+
+Example 82 (a) Find an orthogonal matrix \(P\) such that \(P^{T} A P\) is diagonal where
+
+\[
+A=\left(\begin{array}{ccc}
+1 & -1 & -1 \\
+-1 & 1 & -1 \\
+-1 & -1 & 1
+\end{array}\right)
+\]
+
+(b) Consider the real-valued functions \(f\) and \(g\) defined on \(\mathbb{R}^{3}\) by
+
+\[
+f(\mathbf{x})=x^{2}+y^{2}+z^{2}-2 x y-2 x z-2 y z, \quad g(\mathbf{x})=-y^{2}+2 z^{2}+2 \sqrt{2} x y
+\]
+
+where \(\mathbf{x}=(x, y, z)^{T}\). Is there an invertible matrix \(Q\) such that \(f(Q \mathbf{x})=g(\mathbf{x})\) ? Is there such an orthogonal matrix \(Q\) ?\\
+(c) Sketch the surface \(f(\mathbf{x})=1\).
+
+Solution. (a) The characteristic polynomial \(\chi_{A}(x)\) equals \((x+1)(x-2)^{2}\) so that the eigenvalues are \(-1,2,2\). The -1 -eigenvectors are multiples of \((1,1,1)^{T}\) and the 2 -eigenspace is the plane \(x+y+z=0\). So an orthonormal eigenbasis for \(A\) is
+
+\[
+\frac{(1,1,1)^{T}}{\sqrt{3}}, \quad \frac{(1,-1,0)^{T}}{\sqrt{2}}, \quad \frac{(1,1,-2)^{T}}{\sqrt{6}},
+\]
+
+from which we can form the required
+
+\[
+P=\frac{1}{\sqrt{6}}\left(\begin{array}{ccc}
+\sqrt{2} & \sqrt{3} & 1 \\
+\sqrt{2} & -\sqrt{3} & 1 \\
+\sqrt{2} & 0 & -2
+\end{array}\right)
+\]
+
+(b) We then have that
+
+\[
+f(P \mathbf{x})=(P \mathbf{x})^{T} A(P \mathbf{x})=\mathbf{x}^{T} P^{T} A P \mathbf{x}=-x^{2}+2 y^{2}+2 z^{2} .
+\]
+
+Now we similarly have
+
+\[
+g(\mathbf{x})=(x, y, z)\left(\begin{array}{ccc}
+0 & \sqrt{2} & 0 \\
+\sqrt{2} & -1 & 0 \\
+0 & 0 & 2
+\end{array}\right)\left(\begin{array}{l}
+x \\
+y \\
+z
+\end{array}\right)
+\]
+
+and this matrix (call it \(B\) ) has characteristic polynomial \(\chi_{B}(x)=(x+2)(x-1)(x-2)\). This means that there is an orthogonal matrix \(R\) such that
+
+\[
+g(R \mathbf{x})=-2 x^{2}+y^{2}+2 z^{2}
+\]
+
+We can then see that the (invertible but not orthogonal) map \(S\) which sends \((x, y, z)^{T}\) to \((x / \sqrt{2}, \sqrt{2} y, z)^{T}\) satisfies
+
+\[
+g(R S \mathbf{x})=-2(x / \sqrt{2})^{2}=(\sqrt{2} y)^{2}+2 z^{2}=-x^{2}+2 y^{2}+2 z^{2}
+\]
+
+That \(A\) and \(B\) have the same number of eigenvalues of each sign means that there is an invertible change of variables connecting the functions \(f\) and \(g\), but as \(A\) 's and \(B\) 's eigenvalues are not identical there is no orthogonal change of variable connecting \(f\) and \(g\).\\
+(c) The quadric surface \(f(\mathbf{x})=1\) is a hyperboloid of one sheet, as in Figure 4e, with the new x-axis being the axis of the hyperboloid.
+
+Example 83 (Hessian matrix) Let \(f(x, y)\) be a function of two variables with partial derivatives of all orders. Taylor's theorem in two variables states\\
+\(f(a+\delta, b+\varepsilon)=f(a, b)+\left(f_{x}(a, b) \delta+f_{y}(a, b) \varepsilon\right)+\frac{1}{2}\left(f_{x x}(a, b) \delta^{2}+2 f_{x y}(a, b) \delta \varepsilon+f_{y y}(a, b) \varepsilon^{2}\right)+R_{3}\)\\
+where \(R_{3}\) is a remainder term that is at least total order three in \(\delta_{1}\) and \(\delta_{2}\). A critical point or stationary point ( \(a, b\) ) is one where
+
+\[
+f_{x}(a, b)=0=f_{y}(a, b)
+\]
+
+In geometric terms this would mean that the tangent plane to the surface \(z=f(x, y)\) is horizontal. At a critical point, we then have
+
+\[
+f(a+\delta, b+\varepsilon)=f(a, b)+\frac{1}{2}\left(f_{x x}(a, b) \delta^{2}+2 f_{x y}(a, b) \delta \varepsilon+f_{y y}(a, b) \varepsilon^{2}\right)+R_{3}
+\]
+
+and so the local behaviour of \(f\) near a critical point is determined by the quadratic form
+
+\[
+f_{x x} \delta^{2}+2 f_{x y} \delta \varepsilon+f_{y y} \varepsilon^{2}=\left(\begin{array}{ll}
+\delta \varepsilon
+\end{array}\right)\left(\begin{array}{ll}
+f_{x x} & f_{x y} \\
+f_{x y} & f_{y y}
+\end{array}\right)\binom{\delta}{\varepsilon}
+\]
+
+The symmetric matrix
+
+\[
+H=\left(\begin{array}{ll}
+f_{x x} & f_{x y} \\
+f_{x y} & f_{y y}
+\end{array}\right)
+\]
+
+is known as the Hessian \({ }^{4}\). As \(H\) is symmetric, we know that we can make an orthogonal change of variables \((\delta, \varepsilon) \rightarrow(\Delta, E)\) so that the above quadratic form becomes
+
+\[
+\lambda \Delta^{2}+\mu E^{2}
+\]
+
+where \(\lambda, \mu\) are the eigenvalues of \(H\). We then see that:
+
+\begin{itemize}
+  \item there is a (local) minimum at \((a, b)\) if \(\lambda, \mu>0\);
+  \item there is a (local) maximum at \((a, b)\) if \(\lambda, \mu<0\);
+  \item there is a saddle point at \((a, b)\) if \(\lambda, \mu\) have different signs.
+\end{itemize}
+
+When \(H\) is singular then the critical point is said to be degenerate, and its classification depends on the cubic terms (or higher) in Taylor's theorem.
+
+Example 84 (Norms) Given an inner product space \(V\), then the norm squared \(\|v\|^{2}=\langle v, v\rangle\) is a positive definite quadratic form on \(V\). For a smooth parameterized surface \(\mathbf{r}(s, t)\) in \(\mathbb{R}^{3}\) then the tangent space \(T_{p}\) at a point \(p\) equals the span of \(\mathbf{r}_{s}\) and \(\mathbf{r}_{t}\). The restriction of \(\|v\|^{2}\) to \(T_{p}\) is the quadratic form
+
+\[
+(\alpha, \beta) \mapsto\left\|\alpha \mathbf{r}_{s}+\beta \mathbf{r}_{t}\right\|^{2}=E \alpha^{2}+2 F \alpha \beta+G \beta^{2}
+\]
+
+where
+
+\[
+E=\mathbf{r}_{s} \cdot \mathbf{r}_{s}, \quad F=\mathbf{r}_{s} \cdot \mathbf{r}_{t}, \quad G=\mathbf{r}_{t} \cdot \mathbf{r}_{t}
+\]
+
+and is known as the first fundamental form.\\
+We conclude this chapter with some comments charting the direction of spectral theory into the second year linear algebra and beyond into third year functional analysis. You should consider all these remarks - and the subsequent epilogue - to be beyond the Prelims syllabus but they may make interesting further reading to some.
+
+\footnotetext{\({ }^{4}\) After the German mathematician Ludwig Hesse (1811-1874).
+}Remark 85 (Adjoints) As commented earlier, the spectral theorem is most naturally stated in the context of inner product spaces; a more sophisticated version of the theorem appears in the second year A0 Linear Algebra course. The version we have met states that a real symmetric matrix (or complex Hermitian matrix) is diagonalizable via an orthogonal change of variable.
+
+If we seek to extend this theorem to linear maps on vector spaces, our first problem is that there is no well-defined notion of the 'transpose of a linear map' and so no notion of a symmetric linear map. The determinant of a linear map \(T\) is well-defined precisely because the determinant is the same for any matrix \(A\) representing \(T\) wrt a first basis and \(B\) representing \(T\) wrt a second basis. This is because \(A=P^{-1} B P\), where \(P\) is the change of basis matrix, and so
+
+\[
+\operatorname{det} A=\operatorname{det}\left(P^{-1} B P\right)=\frac{1}{\operatorname{det} P} \operatorname{det} B \operatorname{det} P=\operatorname{det} B
+\]
+
+However if we wished to define the transpose \(T^{T}\) of \(T\) as the linear map represented by \(A^{T}\) wrt the first basis and also the linear map represented by \(B^{T}\) wrt the second basis, then in general these are different linear maps because
+
+\[
+A^{T} \neq P^{-1} B^{T} P
+\]
+
+This can be circumvented if we only consider orthogonal changes of variable \(P\). In this case
+
+\[
+A=P^{T} B P \quad \Longrightarrow \quad A^{T}=P^{T} B^{T} P
+\]
+
+So, should we only use orthonormal bases and orthogonal changes of variable, then we can define the 'transpose' of a linear map. But this discussion takes place more naturally in an inner product space and that 'transpose' is instead referred to as the adjoint of \(T\) written \(T^{*}\).
+
+Given a linear map \(T: V \rightarrow V\) of a finite-dimensional inner product space \(V\), its adjoint \(T^{*}: V \rightarrow V\) is the unique linear map satisfying
+
+\[
+\langle T v, w\rangle=\left\langle v, T^{*} w\right\rangle \quad \text { for all } v, w \in V
+\]
+
+This compares with the algebraic identity
+
+\[
+M \mathbf{v} \cdot \mathbf{w}=\mathbf{v} \cdot M^{T} \mathbf{w}
+\]
+
+for a square matrix \(M\) and co-ordinate vectors \(\mathbf{v}, \mathbf{w}\).\\
+If we choose an orthonormal basis \(v_{1}, \ldots, v_{n}\) for \(V\), and let \(A\) and \(B\) respectively be the matrices for \(T\) and \(T^{*}\) wrt this basis, then
+
+\[
+[A]_{i j}=\left\langle T v_{j}, v_{i}\right\rangle=\left\langle v_{j}, T^{*} v_{i}\right\rangle=[B]_{j i}
+\]
+
+So the matrix for \(T^{*}\) is that of the transpose of the matrix for \(T\). The 'symmetric' linear maps are then those satisfying \(T=T^{*}\), the so-called self-adjoint linear maps which satisfy
+
+\[
+\langle T v, w\rangle=\langle v, T w\rangle \quad \text { for all } v, w \in V
+\]
+
+The second year version of the spectral theorem states:
+
+\begin{itemize}
+  \item Spectral theorem for self-adjoint maps. Let \(T: V \rightarrow V\) be a self-adjoint linear map on a finite-dimensional inner product space. Then all the eigenvalues of \(T\) are real and there is an orthonormal eigenbasis of \(V\).
+\end{itemize}
+
+Example 86 (See Sheet 4, Exercise P3.) The nth Legendre polynomial \(P_{n}(x)\) satisfies Legendre's equation
+
+\[
+\left(1-x^{2}\right) \frac{\mathrm{d}^{2} y}{\mathrm{~d} x^{2}}-2 x \frac{\mathrm{~d} y}{\mathrm{~d} x}+n(n+1) y=0
+\]
+
+where \(n\) is a natural number. This can be rewritten as
+
+\[
+L y=-n(n+1) y \quad \text { where } \quad L=\frac{\mathrm{d}}{\mathrm{~d} x}\left[\left(1-x^{2}\right) \frac{\mathrm{d}}{\mathrm{~d} x}\right]
+\]
+
+So \(P_{n}(x)\) can be viewed as an \(-n(n+1)\)-eigenvector of the differential operator \(L\). Further it can be shown that
+
+\[
+\left\langle P_{n}(x), P_{m}(x)\right\rangle=0 \quad \text { when } n \neq m
+\]
+
+where the inner product \(\langle, \quad\rangle\) is defined by
+
+\[
+\langle f, g\rangle=\int_{-1}^{1} f(x) g(x) \mathrm{d} x
+\]
+
+so that the Legendre polynomials are in fact orthogonal eigenvectors; further still it is true that
+
+\[
+\left\langle L y_{1}, y_{2}\right\rangle=\left\langle y_{1}, L y_{2}\right\rangle
+\]
+
+showing \(L\) to be self-adjoint.\\
+Remark 87 (Spectral Theory - infinite-dimensional spaces) Whilst the space \(\mathbb{R}[x]\) of polynomials is infinite dimensional, the above example is not at a great remove from orthogonally diagonalizing a real symmetric matrix - after all any polynomial can be written as a finite linear combination of Legendre polynomials.
+
+In contrast, Schrödinger's equation in quantum theory has the form
+
+\[
+-\frac{\hbar^{2}}{2 m} \frac{\mathrm{~d}^{2} \psi}{\mathrm{~d} x^{2}}+V(x) \psi=E \psi, \quad \psi(0)=\psi(a)=0
+\]
+
+This equation was formulated in 1925 by the Austrian physicist, Erwin Schrödinger (1887-1961). The above is the time-independent equation of a particle in the interval \(0 \leqslant x \leqslant a\). The wave function \(\psi\) is a complex-valued function of \(x\) and \(|\psi(x)|^{2}\) can be thought of as the probability density function of the particle's position. \(m\) is its mass, \(\hbar\) is the (reduced) Planck constant, \(V(x)\) denotes potential energy and \(E\) is the particle's energy.
+
+A significant, confounding aspect of late nineteenth century experimental physics was the emission spectra of atoms. (By the way, these two uses of the word 'spectrum' in mathematics and physics appear to be coincidental.) As an example, experiments showed that only certain discrete, quantized energies could be released by an excited atom of hydrogen. Classical physical theories were unable to explain this phenomenon.
+
+Schrödinger's equation can be rewritten as \(H \psi=E \psi\) with \(E\) being an eigenvalue of the differential operator \(H\) known as the Hamiltonian. One can again show that
+
+\[
+\left\langle H \psi_{1}, \psi_{2}\right\rangle=\left\langle\psi_{1}, H \psi_{2}\right\rangle
+\]
+
+where
+
+\[
+\langle\varphi, \psi\rangle=\int_{0}^{a} \varphi(x) \overline{\psi(x)} \mathrm{d} x
+\]
+
+And, when \(V\) is constant, it's straightforward to show that the only non-zero solutions of Schrödinger's equation above are
+
+\[
+\psi_{n}(x)=A_{n} \sin \left(\frac{n \pi x}{a}\right) \quad \text { where } \quad E=E_{n}=V+\frac{n^{2} \pi^{2} \hbar^{2}}{2 m a^{2}}
+\]
+
+and \(n\) is a positive integer and \(A_{n}\) is a constant. If \(\left|\psi_{n}(x)\right|^{2}\) is to be a pdf then we need \(A_{n}=\sqrt{2 / a}\), and again these \(\psi_{n}\) are orthonormal with respect to the above complex inner product. Note also that the energy \(E\) can only take certain discrete values \(E_{n}\).
+
+In general, though, a wave function need not be one of these eigenstates \(\psi_{n}\) and may be a finite or indeed infinite combination of them. For example, we might have
+
+\[
+\psi(x)=\sqrt{\frac{30}{a^{5}}} x(a-x)
+\]
+
+for which \(|\psi(x)|^{2}\) is a pdf. How might we write such \(\psi(x)\) as a combination of the \(\psi_{n}(x)\) ? This is an infinite-dimensional version of the problem the spectral theorem solved - how in general to write a vector as a linear combination of orthonormal eigenvectors - and, in the infinite dimensional case is the subject of Fourier analysis, named after the French mathematician Joseph Fourier (1768-1830). In this case Fourier analysis shows that
+
+\[
+\psi(x)=\sum_{0}^{\infty} \alpha_{2 n+1} \psi_{2 n+1}(x) \quad \text { where } \quad \alpha_{n}=\frac{8 \sqrt{15}}{\pi^{3} n^{3}}
+\]
+
+If the particle's energy is measured, it will equal one of the permitted energies \(E_{n}\) and the effect of measuring this energy is to 'collapse' the above wave function \(\psi\) to one of the eigenstates \(\psi_{2 n+1}\). It is the case that
+
+\[
+\sum_{0}^{\infty}\left|\alpha_{2 n+1}\right|^{2}=1
+\]
+
+(this is Parseval's Identity which is essentially an infinite dimensional version of Pythagoras' Theorem). The probability of the particle having energy \(E_{2 n+1}\) is \(\left|\alpha_{2 n+1}\right|^{2}\). The role of measurement in quantum theory is very different from that of classical mechanics; the very act of measuring some observable characteristic of the particle actually affects and changes the wave function.
+
+From the more general point of view, it is important that these wave functions lie not just in an infinite-dimensional complex inner product space, but that this space is a Hilbert space, meaning it is complete - Cauchy sequences are convergent. There is a (somewhat technical) version of the spectral theorem for Hilbert spaces which is the subject of the third year functional analysis courses.
+
+\subsection*{3.1 Epilogue - Singular Value Decomposition (Off-syllabus)}
+We conclude with an important related theorem, namely the singular value decomposition theorem which applies not just to square matrices. The theorem is important in numerical analysis, signal processing, pattern recognition and in particular is used in the Trinity term Statistics and Data Analysis course when discussing principal component analysis.
+
+Recall that, given an \(m \times n\) matrix \(A\) of rank \(r\) then there exist an invertible \(m \times m\) matrix \(P\) and an invertible \(n \times n\) matrix \(Q\) such that
+
+\[
+P A Q=\left(\begin{array}{cc}
+I_{r} & 0_{r, n-r} \\
+0_{m-r, r} & 0_{m-r, n-r}
+\end{array}\right) .
+\]
+
+The matrix \(P\) results from the elementary matrices used to put \(A\) into RRE form, and then ECOs can be used to move the \(r\) leading 1s to the first \(r\) columns and clear out the rest of the rows.
+
+A natural alternative question is: what form can \(A\) be put into if \(P\) and \(Q\) are required to be orthogonal instead?
+
+Theorem 88 (Singular Value Decomposition (SVD) \({ }^{5}\) ) Let \(A\) be an \(m \times n\) matrix of rank \(r\). Then there exist an orthogonal \(m \times m\) matrix \(P\) and an orthogonal \(n \times n\) matrix \(Q\) such that
+
+\[
+P A Q=\left(\begin{array}{cc}
+D & 0 \\
+0 & 0
+\end{array}\right) \text {, }
+\]
+
+where \(D\) is an invertible diagonal \(r \times r\) matrix with positive entries listed in decreasing order.\\
+Proof. Note that \(A^{T} A\) is a symmetric \(n \times n\) matrix. So by the spectral theorem there is an \(n \times n\) orthogonal matrix \(Q\) such that
+
+\[
+Q^{T} A^{T} A Q=\left(\begin{array}{cc}
+\Delta & 0_{r, n-r} \\
+0_{n-r, r} & 0_{n-r, n-r}
+\end{array}\right)
+\]
+
+where \(\Delta\) is a diagonal \(r \times r\) matrix with its diagonal entries in decreasing order. Note that \(A^{T} A\) has the same rank \(r\) as \(A\) (Sheet 4, Exercise S3), and that the eigenvalues of \(A^{T} A\) are non-negative, the positive eigenvalues being the entries of \(\Delta\). If we write
+
+\[
+Q=\left(\begin{array}{ll}
+Q_{1} & Q_{2}
+\end{array}\right)
+\]
+
+where \(Q_{1}\) is \(n \times r\) and \(Q_{2}\) is \(n \times(n-r)\), then
+
+\[
+Q_{1}^{T} A^{T} A Q_{1}=\Delta ; \quad Q_{2}^{T} A^{T} A Q_{2}=0 ; \quad Q_{1}^{T} Q_{1}=I_{r} ; \quad Q_{1} Q_{1}^{T}+Q_{2} Q_{2}^{T}=I_{n}
+\]
+
+the last two equations following from \(Q\) 's orthogonality. Now \(\left(A Q_{2}\right)^{T}\left(A Q_{2}\right)=0\) from the second equation and hence \(A Q_{2}=0_{m, n-r}\) by Sheet 4, Exercise S3 again.
+
+\footnotetext{\({ }^{5}\) The SVD was independently proved by Beltrami in 1873 and Jordan in 1874.
+}If \(\Delta=\operatorname{diag}\left(\lambda_{1}, \ldots, \lambda_{r}\right)\) then we may set \(D=\operatorname{diag}\left(\sqrt{\lambda_{1}}, \ldots, \sqrt{\lambda_{r}}\right)\), so that \(D^{2}=\Delta\). We then define \(P_{1}\) to be the \(m \times r\) matrix
+
+\[
+P_{1}=A Q_{1} D^{-1}
+\]
+
+Note that
+
+\[
+P_{1} D Q_{1}^{T}=A Q_{1} Q_{1}^{T}=A\left(I_{n}-Q_{2} Q_{2}^{T}\right)=A-\left(A Q_{2}\right) Q_{2}^{T}=A .
+\]
+
+We are almost done now as, by the transpose product rule and because \(D\) is diagonal, we have
+
+\[
+P_{1}^{T} P_{1}=\left(A Q_{1} D^{-1}\right)^{T}\left(A Q_{1} D^{-1}\right)=D^{-1} Q_{1}^{T} A^{T} A Q_{1} D^{-1}=D^{-1} \Delta D^{-1}=I_{r}
+\]
+
+and also that
+
+\[
+P_{1}^{T} A Q_{1}=P_{1}^{T} P_{1} D=I_{r} D=D
+\]
+
+That \(P_{1}^{T} P_{1}=I_{r}\) means the columns of \(P_{1}\) form an orthonormal set, which can be extended to an orthonormal basis for \(\mathbb{R}_{\text {col }}^{m}\). We put these vectors as the columns of an orthogonal \(m \times m\) matrix \(P^{T}=\left(\begin{array}{ll}P_{1} & P_{2}\end{array}\right)\) and note that
+
+\[
+P_{2}^{T} A Q_{1}=P_{2}^{T} P_{1} D=0_{m-r, r} D=0_{m-r, r}
+\]
+
+as the columns of \(P\) are orthogonal. Finally we have that \(P A Q\) equals
+
+\[
+\begin{aligned}
+\binom{P_{1}^{T}}{P_{2}^{T}} A\left(\begin{array}{ll}
+Q_{1} & Q_{2}
+\end{array}\right) & =\binom{P_{1}^{T}}{P_{2}^{T}}\left(\begin{array}{ll}
+A Q_{1} & 0_{m . n-r}
+\end{array}\right) \\
+& =\left(\begin{array}{cc}
+P_{1}^{T} A Q_{1} & 0_{r . n-r} \\
+0_{m-r . r} & 0_{m-r, n-r}
+\end{array}\right)=\left(\begin{array}{cc}
+D & 0_{r . n-r} \\
+0_{m-r . r} & 0_{m-r, n-r}
+\end{array}\right)
+\end{aligned}
+\]
+
+Example 89 Find the SVD of
+
+\[
+A=\left(\begin{array}{cccc}
+1 & 0 & 2 & 1 \\
+0 & 2 & 1 & -1
+\end{array}\right)
+\]
+
+Solution. Firstly
+
+\[
+A^{T} A=\left(\begin{array}{cc}
+1 & 0 \\
+0 & 2 \\
+2 & 1 \\
+1 & -1
+\end{array}\right)\left(\begin{array}{cccc}
+1 & 0 & 2 & 1 \\
+0 & 2 & 1 & -1
+\end{array}\right)=\left(\begin{array}{cccc}
+1 & 0 & 2 & 1 \\
+0 & 4 & 2 & -2 \\
+2 & 2 & 5 & 1 \\
+1 & -2 & 1 & 2
+\end{array}\right) .
+\]
+
+\(A^{T} A\) has characteristic polynomial
+
+\[
+x^{4}-12 x^{3}+35 x^{2}=x^{2}(x-5)(x-7)
+\]
+
+We can then take
+
+\[
+Q=\left(\begin{array}{cccc}
+\frac{1}{\sqrt{14}} & \frac{1}{\sqrt{10}} & -\frac{2}{3} & -\frac{4}{\sqrt{21}} \\
+\frac{2}{\sqrt{14}} & -\frac{2}{\sqrt{10}} & \frac{1}{3} & -\frac{1}{\sqrt{21}} \\
+\frac{3}{\sqrt{14}} & \frac{1}{\sqrt{10}} & 0 & \frac{2}{\sqrt{21}} \\
+0 & \frac{2}{\sqrt{10}} & \frac{2}{3} & 0
+\end{array}\right)
+\]
+
+so that \(Q^{T} A^{T} A Q=\operatorname{diag}(7,5,0,0)\). We then set \(P_{1}=A Q_{1} D^{-1}\) to give
+
+\[
+P_{1}=\left(\begin{array}{cccc}
+1 & 0 & 2 & 1 \\
+0 & 2 & 1 & -1
+\end{array}\right)\left(\begin{array}{cc}
+\frac{1}{\sqrt{14}} & \frac{1}{\sqrt{10}} \\
+\frac{2}{\sqrt{14}} & -\frac{2}{\sqrt{10}} \\
+\frac{3}{\sqrt{14}} & \frac{1}{\sqrt{10}} \\
+0 & \frac{2}{\sqrt{10}}
+\end{array}\right)\left(\begin{array}{cc}
+\frac{1}{\sqrt{7}} & 0 \\
+0 & \frac{1}{\sqrt{5}}
+\end{array}\right)=\left(\begin{array}{cc}
+\frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
+\frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+\end{array}\right)
+\]
+
+and so
+
+\[
+P=P_{1}^{T}=\left(\begin{array}{cc}
+\frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
+\frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+\end{array}\right)
+\]
+
+Remark 90 With notation as in Theorem 88, the pseudoinverse (or Moore-Penrose inverse) of \(A\) is
+
+\[
+A^{+}=Q\left(\begin{array}{cc}
+D^{-1} & 0_{r, m-r} \\
+0_{n-r, r} & 0_{n-r, m-r}
+\end{array}\right) P
+\]
+
+The following facts are then true of the pseudoinverse.\\
+(a) If \(A\) is invertible then \(A^{-1}=A^{+}\).\\
+(b) \(\left(A^{T}\right)^{+}=\left(A^{+}\right)^{T}\).\\
+(c) \((A B)^{+} \neq B^{+} A^{+}\)in general.\\
+(d) The pseudoinverse has the following properties.\\
+(I) \(\quad A A^{+} A=A ; \quad\) (II) \(\quad A^{+} A A^{+}=A^{+} ; \quad\) (III) \(\quad A A^{+} \quad\) and \(\quad A^{+} A \quad\) are symmetric.\\
+(e) \(A^{+}\)is the only matrix to have the properties I, II, III.\\
+(f) \(A A^{+}\)is orthogonal projection onto the column space of \(A\).\\
+(g) If the columns of \(A\) are independent then \(A^{+}=\left(A^{T} A\right)^{-1} A^{T}\).\\
+(h) For \(\mathbf{b} \in \mathbb{R}_{\text {col }}^{m}\) set \(\mathbf{x}_{0}=A^{+} \mathbf{b}\). Then
+
+\[
+|A \mathbf{x}-\mathbf{b}| \geqslant\left|A \mathbf{x}_{0}-\mathbf{b}\right| \quad \text { for all } \mathbf{x} \text { in } \mathbb{R}_{\mathrm{col}}^{n}
+\]
+
+
+\end{document}
